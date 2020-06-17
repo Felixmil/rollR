@@ -1,0 +1,13 @@
+Package: rollr
+Type: Package
+Title: Run All Sorts of Dice Rolls
+Version: 0.1.0
+Author: Félix MIL
+Maintainer: Félix MIL <felix.mil@outlook.com>
+Description: Make all sorts of dice rolls using text. Largely inspired by dice notations 
+    from tabletop turn-based RPGs.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    testthat
