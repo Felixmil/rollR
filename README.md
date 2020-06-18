@@ -4,7 +4,8 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of rollr is to provide a simple way to make complicated dice rolls using syntax inspired by tabletop roleplaying games.
+This R package provides a simple way to make all sorts of dice rolls using syntax inspired from tabletop roleplaying games.
+
 
 ## Installation
 
