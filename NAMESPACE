@@ -3,3 +3,4 @@
 export(evaluate_roll_cmd)
 export(parse_roll_cmd)
 export(roll_dice)
+export(roll_one)
