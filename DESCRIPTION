@@ -9,5 +9,8 @@ Description: Make all sorts of dice rolls using text. Largely inspired by dice n
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
+Imports:
+    stringr
 Suggests: 
     testthat
+RoxygenNote: 7.1.0
