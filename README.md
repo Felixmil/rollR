@@ -21,14 +21,23 @@ roll("3d6")
 roll("2d20h1")
 ```
 
-## Dice roll syntax
+## Rolls syntax (What you can do)
 
-Features list taken from [Sidekick](https://github.com/ArtemGr/Sidekick)
+Features list derivated from [Sidekick](https://github.com/ArtemGr/Sidekick)
 
+- [x] `/r 1d8 + 2` - Roll one octahedron and add two.
 
-- [ ] `/r 1d8 + 4d6` - Roll one octahedron and four hexahedrons.
+- [x] `/r 1d8 + 4d6` - Roll one octahedron and four hexahedrons.
 
-- [ ] `/r 1d20+5 # Grog attacks` - Roll dice with a comment.
+- [x] `/r 2d20h1` - Roll twice and keep the highest roll (D&D 5e advantage).
+
+- [x] `/r 2d20h1 + 2` - Roll twice and keep the highest roll, with a modifier (D&D 5e advantage).
+
+- [x] `/r 2d20l1` - Roll twice and keep the lowest roll (D&D 5e disadvantage).
+
+- [ ] `/r 1d20r1` - Roll twenty, reroll on one (because halflings are lucky).
+
+- [ ] `/r 3d6!` - Exploding dice.
 
 - [ ] `/r 2d6>=5` - Roll two hexahedrons and take only the ones that turned greater or equal to five (aka difficulty check). Prints the number of successes.
 
@@ -40,23 +49,13 @@ Features list taken from [Sidekick](https://github.com/ArtemGr/Sidekick)
 
 - [ ] `/r 4dF` - [Fudge/Fate dice](http://rpg.stackexchange.com/questions/1765/what-game-circumstance-uses-fudge-dice).
 
-- [ ] `/r 3d6!` - Exploding dice.
-
 - [ ] `/r 1d10!>9` - Explode nine and ten.
-
-- [ ] `/r 1d20r1` - Roll twenty, reroll on one (because halflings are lucky).
 
 - [ ] `/r 3d10!>=8` - nWoD roll: tens explode, eights and up are treated like a success.
 
-- [ ] `/r 1d10t10` - If a ten is rolled then count it [twice](https://github.com/ArtemGr/Sidekick/issues/151).
+- [ ] `/r 1d10t10` - If a ten is rolled then count it twice.
 
-- [ ] `/r 2d20k1` - Roll twice and keep the highest roll (D&D 5e advantage).
-
-- [ ] `/r 2d20k1 + 2` - Roll twice and keep the highest roll, with a modifier (D&D 5e advantage).
-
-- [ ] `/r 2d20kl1` - Roll twice and keep the lowest roll (D&D 5e disadvantage).
-
-- [ ] `/r 4d6k3` - Roll four hexahedrons and keep the highest three (D&D 5e ability roll).
+- [x] `/r 4d6k3` - Roll four hexahedrons and keep the highest three (D&D 5e ability roll).
 
 - [ ] `/r repeat (4d6k3, 6)` - Roll D&D 5e ability score six times (to generate a new character).
 
