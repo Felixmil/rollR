@@ -9,7 +9,7 @@ evaluate_roll_cmd <- function(parsed_cmd){
   final_result <- NA
 
   for (i in 1:length(parsed_cmd$elements)) {
-    result <- roll_one(parsed_cmd$elements[i],parsed_cmd$operators[i-1])
+    result <- roll_one(parsed_cmd$elements[i])
     if (is.na(final_result)) {
       final_result = result
     } else {
