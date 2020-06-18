@@ -9,8 +9,10 @@ This R package provides a simple way to make all sorts of dice rolls using synta
 
 ## Installation
 
+```
 # install.packages("remotes")
 remotes::install_github("felixmil/rollr")
+```
 
 ## Example
 
