@@ -3,7 +3,6 @@
 #' @param parsed_cmd
 #'
 #' @return
-#' @export
 #'
 #' @examples
 evaluate_roll_cmd <- function(parsed_cmd){

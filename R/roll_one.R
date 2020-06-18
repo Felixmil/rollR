@@ -3,7 +3,6 @@
 #' @param dice a string corresponding to a dice command
 #'
 #' @return result of the roll(s)
-#' @export
 #'
 #' @examples
 roll_one <- function(dice, operator){
