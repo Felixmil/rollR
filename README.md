@@ -50,9 +50,9 @@ Features list derivated from [Sidekick](https://github.com/ArtemGr/Sidekick)
 
 - [x] `/r 3d6!` - Exploding dice.
 
-- [ ] `/r 2d6>=5` - Roll two hexahedrons and take only the ones that turned greater or equal to five (aka difficulty check). Prints the number of successes.
+- [x] `/r 2d6>=5` - Roll two hexahedrons and take only the ones that turned greater or equal to five (aka difficulty check). Prints the number of successes.
 
-- [ ] `/r 4d6=5` - So can this guy roll five?
+- [x] `/r 4d6=5` - So can this guy roll five?
 
 - [ ] `/r 3d10>=6f1` - oWoD roll: rolling *one* is a failure, rolling more failures than successes is a *botch*.
 

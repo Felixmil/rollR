@@ -31,6 +31,20 @@ test_that("reroll dice works",{
   expect_equal(roll,36)
 })
 
+test_that("sucess dice works",{
+  set.seed(42)
+  roll = roll_one("6d6>4")
+  expect_equal(roll,1)
+  roll = roll_one("6d6>=4")
+  expect_equal(roll, 2)
+  roll = roll_one("6d6<3")
+  expect_equal(roll, 3)
+  roll = roll_one("6d6<=2")
+  expect_equal(roll, 1)
+  roll = roll_one("6d6=4")
+  expect_equal(roll, 2)
+})
+
 test_that("warning works",{
   set.seed(42)
   expect_warning(roll_one("wrong_syntax"))

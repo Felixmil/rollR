@@ -35,7 +35,7 @@ simple = list(pattern = "^(\\d+)[dD](\\d+)$",
                 result = sum(rolls)
               })
 
-keep_h = list(pattern = "^(\\d+)[dD](\\d+)[Hh](\\d+)",
+keep_h = list(pattern = "^(\\d+)[dD](\\d+)[Hh](\\d+)$",
               compute = function(match) {
                 n = match[2]
                 sides = match[3]
@@ -47,7 +47,7 @@ keep_h = list(pattern = "^(\\d+)[dD](\\d+)[Hh](\\d+)",
                 result =  sum(kept_dice)
               })
 
-keep_l = list(pattern = "^(\\d+)[dD](\\d+)[Ll](\\d+)",
+keep_l = list(pattern = "^(\\d+)[dD](\\d+)[Ll](\\d+)$",
               compute = function(match) {
                 n = match[2]
                 sides = match[3]
@@ -59,7 +59,7 @@ keep_l = list(pattern = "^(\\d+)[dD](\\d+)[Ll](\\d+)",
                 result =  sum(kept_dice)
               })
 
-exploding = list(pattern ="^(\\d+)[dD](\\d+)\\!",
+exploding = list(pattern ="^(\\d+)[dD](\\d+)\\!$",
                  compute = function(match) {
                   n = match[2]
                   sides = match[3]
@@ -77,7 +77,7 @@ exploding = list(pattern ="^(\\d+)[dD](\\d+)\\!",
                   result = sum(rolls)
                  })
 
-reroll = list(pattern = "^(\\d+)[dD](\\d+)[rR](\\d+)",
+reroll = list(pattern = "^(\\d+)[dD](\\d+)[rR](\\d+)$",
               compute = function(match) {
                 n = match[2]
                 sides = match[3]
@@ -96,11 +96,29 @@ reroll = list(pattern = "^(\\d+)[dD](\\d+)[rR](\\d+)",
                 result = sum(rolls)
               })
 
+success = list(pattern = "^(\\d+)[dD](\\d+) ?([<>]?=?) ?(\\d+)$",
+               compute = function(match) {
+                 n = match[2]
+                 sides = match[3]
+                 comparator = match[4]
+                 if (comparator == "=") {comparator="=="}
+                 threshold = match[5]
+                 rolls = sample(1:sides, n, replace = TRUE)
+                 message('rolls: ', paste(rolls, collapse = ', '))
+                 success = eval(parse(text = paste("rolls[rolls",comparator,"threshold]")))
+                 result = length(success)
+                 message('number of success: ',
+                         result ,
+                         ' (', paste(sort(success,decreasing = TRUE), collapse = ', '),')')
+                 return(result)
+                 })
+
 roll_types = list(
   no_dice,
   simple,
   keep_h,
   keep_l,
   exploding,
-  reroll
+  reroll,
+  success
 )
