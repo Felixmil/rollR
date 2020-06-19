@@ -37,7 +37,7 @@ Features list derivated from [Sidekick](https://github.com/ArtemGr/Sidekick)
 
 - [ ] `/r 1d20r1` - Roll twenty, reroll on one (because halflings are lucky).
 
-- [ ] `/r 3d6!` - Exploding dice.
+- [x] `/r 3d6!` - Exploding dice.
 
 - [ ] `/r 2d6>=5` - Roll two hexahedrons and take only the ones that turned greater or equal to five (aka difficulty check). Prints the number of successes.
 
