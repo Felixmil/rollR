@@ -24,7 +24,7 @@ set.seed(42)
 roll_dice("1d12") # rolls one 12-sided dice
 [1] 1
 
-roll_dice("1d12", roll_history = TRUE) # rolls one 12-sided dice
+roll_dice("1d12", roll_history = TRUE) # with roll_history, rolls are detailed.
 
 Evaluating "1d12" 
 ==========
@@ -33,7 +33,7 @@ rolls: 5
  Result is 5
 [1] 5
 
-roll_dice("1d20+2") # roll one 20-sided dice then adds 2
+roll_dice("1d20+2", roll_history = TRUE) # roll one 20-sided dice then adds 2
 
 Evaluating "1d20+2" 
 ==========
@@ -42,7 +42,7 @@ rolls: 1
  Result is 3
 [1] 3
 
-roll_dice("2d10 + 1d4") # rolls two 10-sided dice and one 4-sided diced and sums their results 
+roll_dice("2d10 + 1d4", roll_history = TRUE) # rolls two 10-sided dice and one 4-sided diced and sums their results 
 
 Evaluating "2d10 + 1d4" 
 ==========
@@ -52,7 +52,7 @@ rolls: 4
  Result is 23
 [1] 23
 
-roll_dice("4d6k3") # rolls four 6-sided dice and sum the 3 highests
+roll_dice("4d6k3", roll_history = TRUE) # rolls four 6-sided dice and sum the 3 highests
 
 Evaluating "4d6h3" 
 ==========
@@ -62,7 +62,7 @@ keeping 3 highest(s): 4, 2, 2
  Result is 8
 [1] 8
 
-roll_dice("2d20l1") # rolls two 20-sided dice and keeps the lowest one
+roll_dice("2d20l1", roll_history = TRUE) # rolls two 20-sided dice and keeps the lowest one
 
 Evaluating "2d20l1" 
 ==========
