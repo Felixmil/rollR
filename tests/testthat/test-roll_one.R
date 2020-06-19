@@ -31,6 +31,7 @@ test_that("reroll dice works",{
   expect_equal(roll,36)
 })
 
+
 test_that("sucess dice works",{
   set.seed(42)
   roll = roll_one("6d6>4")

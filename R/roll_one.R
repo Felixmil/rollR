@@ -120,5 +120,6 @@ roll_types = list(
   keep_l,
   exploding,
   reroll,
-  success
+  success,
+  reroll
 )
