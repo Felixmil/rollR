@@ -64,23 +64,43 @@ exploding = list(pattern ="^(\\d+)[dD](\\d+)\\!",
                   n = match[2]
                   sides = match[3]
                   rolls = sample(1:sides, n, replace = TRUE)
-                  exploded = rolls[rolls == sides]
+                  explode = rolls[rolls == sides]
                   message('rolls: ', paste(rolls, collapse = ', '))
-                  message(length(exploded),' dice exploding')
-                  while (length(exploded) != 0) {
-                    new_rolls = sample(1:sides, length(exploded), replace = TRUE)
+                  message("exploding ", length(explode),' dice...')
+                  while (length(explode) != 0) {
+                    new_rolls = sample(1:sides, length(explode), replace = TRUE)
                     message('new rolls : ', paste(new_rolls, collapse = ', '))
                     rolls = c(rolls, new_rolls)
-                    exploded = new_rolls[new_rolls==sides]
-                    if (length(exploded) != 0) { message(length(exploded),' dice exploding') }
+                    explode = new_rolls[new_rolls==sides]
+                    if (length(explode) != 0) { message("exploding ", length(explode),' dice...') }
                   }
                   result = sum(rolls)
                  })
+
+reroll = list(pattern = "^(\\d+)[dD](\\d+)[rR](\\d+)",
+              compute = function(match) {
+                n = match[2]
+                sides = match[3]
+                to_reroll = match[4]
+                rolls = sample(1:sides, n, replace = TRUE)
+                message('rolls: ', paste(rolls, collapse = ', '))
+                reroll = rolls[rolls == to_reroll]
+                message("rerolling ",length(reroll),' dice')
+                while (length(reroll) != 0) {
+                  new_rolls = sample(1:sides, length(reroll), replace = TRUE)
+                  message('new rolls : ', paste(new_rolls, collapse = ', '))
+                  rolls[rolls == to_reroll] = new_rolls
+                  reroll = rolls[rolls == to_reroll]
+                  if (length(reroll) != 0) { message("rerolling ",length(reroll),' dice')}
+                }
+                result = sum(rolls)
+              })
 
 roll_types = list(
   no_dice,
   simple,
   keep_h,
   keep_l,
-  exploding
+  exploding,
+  reroll
 )
