@@ -52,7 +52,7 @@ rolls: 4
  Result is 23
 [1] 23
 
-roll_dice("4d6k3", roll_history = TRUE) # rolls four 6-sided dice and sum the 3 highests
+roll_dice("4d6h3", roll_history = TRUE) # rolls four 6-sided dice and sum the 3 highests
 
 Evaluating "4d6h3" 
 ==========
