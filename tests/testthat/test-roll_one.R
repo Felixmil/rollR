@@ -19,6 +19,11 @@ test_that("keep lowest works",{
   expect_equal(roll, 2)
 })
 
+test_that("exploding dice works", {
+  set.seed(42)
+  roll = roll_one("5d10!")
+  expect_equal(roll,30)
+})
 
 
 test_that("warning works",{
