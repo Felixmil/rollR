@@ -52,9 +52,28 @@ keep_l = list(pattern = "^(\\d+)[dD](\\d+)[Ll](\\d+)",
                 result =  sum(sort(rolls)[1:as.numeric(kept)])
               })
 
+exploding = list(pattern ="^(\\d+)[dD](\\d+)\\!",
+                 compute = function(match) {
+                  n = match[2]
+                  sides = match[3]
+                  rolls = sample(1:sides, n, replace = TRUE)
+                  exploded = rolls[rolls == sides]
+                  message('rolls: ', paste(rolls, collapse = ', '))
+                  message(length(exploded),' dice exploding')
+                  while (length(exploded) != 0) {
+                    new_rolls = sample(1:sides, length(exploded), replace = TRUE)
+                    message('new rolls : ', paste(new_rolls, collapse = ', '))
+                    rolls = c(rolls, new_rolls)
+                    exploded = new_rolls[new_rolls==sides]
+                    if (length(exploded) != 0) { message(length(exploded),' dice exploding') }
+                  }
+                  result = sum(rolls)
+                 })
+
 roll_types = list(
   no_dice,
   simple,
   keep_h,
-  keep_l
+  keep_l,
+  exploding
 )
