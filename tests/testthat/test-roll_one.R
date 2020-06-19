@@ -25,6 +25,11 @@ test_that("exploding dice works", {
   expect_equal(roll,30)
 })
 
+test_that("reroll dice works",{
+  set.seed(42)
+  roll = roll_one("10d6r1")
+  expect_equal(roll,36)
+})
 
 test_that("warning works",{
   set.seed(42)

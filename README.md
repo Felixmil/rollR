@@ -46,7 +46,7 @@ Features list derivated from [Sidekick](https://github.com/ArtemGr/Sidekick)
 
 - [x] `/r 2d20l1` - Roll twice and keep the lowest roll (D&D 5e disadvantage).
 
-- [ ] `/r 1d20r1` - Roll twenty, reroll on one (because halflings are lucky).
+- [x] `/r 1d20r1` - Roll twenty, reroll on one (because halflings are lucky).
 
 - [x] `/r 3d6!` - Exploding dice.
 
