@@ -6,7 +6,7 @@
 #'
 #' @examples
 parse_roll_cmd <- function(roll_cmd) {
-    pattern = "[[\\p{P}][\\p{S}]]"
+    pattern = "[\\+-\\/\\*]"
 
     elements <- trimws(stringr::str_split(roll_cmd, pattern)[[1]])
 
