@@ -76,5 +76,23 @@ Features list derivated from [Sidekick](https://github.com/ArtemGr/Sidekick)
 
 - [ ] `/r ova (5)` - OVA. 6, 6, 1, 1, 1 = 12.
 
+## Tests
 
+```
+Loading rollr
+Testing rollr
+✓ |  OK F W S | Context
+✓ |   1       | evaluate_roll_cmd
+✓ |   4       | parse_roll_cmd
+✓ |   5       | roll_dice
+✓ |  12       | roll_one
+
+══ Results ════════════════════════════════════════
+Duration: 0.2 s
+
+OK:       22
+Failed:   0
+Warnings: 0
+Skipped:  0
+```
 
