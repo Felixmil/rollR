@@ -31,6 +31,7 @@ simple = list(pattern = "^(\\d+)[dD](\\d+)$",
                 n = match[2]
                 sides = match[3]
                 rolls = sample(1:sides, n, replace = TRUE)
+                message('rolls: ', paste(rolls, collapse = ', '))
                 result = sum(rolls)
               })
 
@@ -40,7 +41,10 @@ keep_h = list(pattern = "^(\\d+)[dD](\\d+)[Hh](\\d+)",
                 sides = match[3]
                 kept = match[4]
                 rolls = sample(1:sides, n, replace = TRUE)
-                result =  sum(sort(rolls, decreasing = T)[1:as.numeric(kept)])
+                message('rolls: ', paste(rolls, collapse = ', '))
+                kept_dice = sort(rolls, decreasing = T)[1:as.numeric(kept)]
+                message('keeping ',kept, " highest(s): ", paste(kept_dice, collapse = ', '))
+                result =  sum(kept_dice)
               })
 
 keep_l = list(pattern = "^(\\d+)[dD](\\d+)[Ll](\\d+)",
@@ -49,7 +53,10 @@ keep_l = list(pattern = "^(\\d+)[dD](\\d+)[Ll](\\d+)",
                 sides = match[3]
                 kept = match[4]
                 rolls = sample(1:sides, n, replace = TRUE)
-                result =  sum(sort(rolls)[1:as.numeric(kept)])
+                message('rolls: ', paste(rolls, collapse = ', '))
+                kept_dice = sort(rolls)[1:as.numeric(kept)]
+                message('keeping ',kept, " lowest(s): ", paste(kept_dice, collapse = ', '))
+                result =  sum(kept_dice)
               })
 
 exploding = list(pattern ="^(\\d+)[dD](\\d+)\\!",
