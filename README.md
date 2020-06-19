@@ -1,24 +1,35 @@
 
-# rollr
+# RollR 🎲
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of rollr is to provide a simple way to make complicated dice rolls using syntax inspired by tabletop roleplaying games.
+This R package provides a simple way to make all sorts of dice rolls using syntax inspired from tabletop roleplaying games.
+
 
 ## Installation
 
-Not yet
+```
+# install.packages("remotes")
+remotes::install_github("felixmil/rollr")
+```
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(rollr)
 
-roll("3d6")
-roll("2d20h1")
+roll_dice("1d12") # rolls one 12-sided dice
+
+roll_dice("1d20+2") # roll one 20-sided dice then adds 2
+
+roll_dice("2d10 + 1d4") # rolls two 10-sided dice and one 4-sided diced and sums their results 
+
+roll_dice("4d6k3") # rolls four 6-sided dice and sum the 3 highests
+
+roll_dice("2d20l1") # rolls two 20-sided dice and keeps the lowest one
+
 ```
 
 ## Rolls syntax (What you can do)
