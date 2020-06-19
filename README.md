@@ -14,25 +14,98 @@ This R package provides a simple way to make all sorts of dice rolls using synta
 remotes::install_github("felixmil/rollr")
 ```
 
-## Example
+## Features Examples
 
 
 ``` r
 library(rollr)
+set.seed(42)
 
 roll_dice("1d12") # rolls one 12-sided dice
+[1] 1
+
+roll_dice("1d12", roll_history = TRUE) # rolls one 12-sided dice
+
+Evaluating "1d12" 
+==========
+rolls: 5
+==========
+ Result is 5
+[1] 5
 
 roll_dice("1d20+2") # roll one 20-sided dice then adds 2
 
+Evaluating "1d20+2" 
+==========
+rolls: 1
+==========
+ Result is 3
+[1] 3
+
 roll_dice("2d10 + 1d4") # rolls two 10-sided dice and one 4-sided diced and sums their results 
+
+Evaluating "2d10 + 1d4" 
+==========
+rolls: 9, 10
+rolls: 4
+==========
+ Result is 23
+[1] 23
 
 roll_dice("4d6k3") # rolls four 6-sided dice and sum the 3 highests
 
+Evaluating "4d6h3" 
+==========
+rolls: 2, 2, 1, 4
+keeping 3 highest(s): 4, 2, 2
+==========
+ Result is 8
+[1] 8
+
 roll_dice("2d20l1") # rolls two 20-sided dice and keeps the lowest one
+
+Evaluating "2d20l1" 
+==========
+rolls: 5, 14
+keeping 1 lowest(s): 5
+==========
+ Result is 5
+[1] 5
+
+roll_dice("6d6!", roll_history = TRUE) # rolls six 6-sided dice. 6 are kept and another dice is rolled and added to the score
+
+Evaluating "6d6!" 
+==========
+rolls: 4, 2, 2, 3, 1, 1
+exploding 0 dice...
+==========
+ Result is 13
+[1] 13
+
+roll_dice("6d4r1", roll_history = TRUE) # rolls 6 4-sided dice. 1 are rerolled until no 1 are found.
+
+Evaluating "6d4r1" 
+==========
+rolls: 3, 4, 1, 3, 1, 1
+rerolling 3 dice
+new rolls : 4, 2, 4
+==========
+ Result is 20
+[1] 20
+
+roll_dice("6d6>3", roll_history = TRUE) # rolls six 6-sided dice. count the number of dice above 3. (works with <, <=, >= and =)
+Evaluating "6d6>3" 
+==========
+rolls: 3, 2, 1, 2, 6, 3
+number of success: 1 (6)
+==========
+ Result is 1
+[1] 1
+
 
 ```
 
-## Rolls syntax (What you can do)
+## Rolls syntax (Feature Checklist)
 
 Features list derivated from [Sidekick](https://github.com/ArtemGr/Sidekick)
 
