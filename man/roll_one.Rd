@@ -2,20 +2,16 @@
 % Please edit documentation in R/roll_one.R
 \name{roll_one}
 \alias{roll_one}
-\title{Roll a die from text command}
+\title{Roll One}
 \usage{
 roll_one(roll)
 }
 \arguments{
-\item{roll}{a string corresponding to a roll command}
+\item{roll}{a string corresponding to a roll command.}
 }
 \value{
-result of the roll(s)
+result of the roll
 }
 \description{
-Roll a die from text command
-}
-\examples{
-roll_one("1d6")
-
+Roll one die from string command.
 }

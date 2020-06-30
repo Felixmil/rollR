@@ -2,19 +2,25 @@
 % Please edit documentation in R/roll_dice.R
 \name{roll_dice}
 \alias{roll_dice}
-\title{Roll several dice and perform computations}
+\title{Roll Dice}
 \usage{
 roll_dice(cmd, roll_history = FALSE)
 }
 \arguments{
-\item{cmd}{the string describing the dice roll to simulate}
+\item{cmd}{character string describing the dice roll to compute.}
+
+\item{roll_history}{boolean, if TRUE, dice rolls details are visible in the console.}
 }
 \value{
 result of the dice roll computation
 }
 \description{
-Roll several dice and perform computations
+Main function to use the library. This function wraps all the computing functions of the library. let the user choose between print or hide all rolls details in the console.
 }
 \examples{
+
+roll_dice("1d10 + 20")
+roll_dice("1d4 * 2")
+roll_dice("2d20h1")
 
 }

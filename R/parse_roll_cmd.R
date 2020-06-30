@@ -1,18 +1,19 @@
-#' Title
+#' A roll command parser
 #'
-#' @param roll_cmd
+#' @description The roll command parser transform a complex roll command into a set of
+#' individual rolls and operations.
 #'
-#' @return
+#' @param roll_cmd a string containing the roll command.
 #'
-#' @examples
+#' @return a list containing dice to roll and mathematical operators.
 parse_roll_cmd <- function(roll_cmd) {
     pattern = "[\\+-\\/\\*]"
 
-    elements <- trimws(stringr::str_split(roll_cmd, pattern)[[1]])
+    dices <- trimws(stringr::str_split(roll_cmd, pattern)[[1]])
 
     operators <- stringr::str_extract_all(roll_cmd, pattern)[[1]]
 
-    parsed_cmd <- list(elements=elements,
+    parsed_cmd <- list(dices=dices,
                        operators=operators)
     return(parsed_cmd)
 }

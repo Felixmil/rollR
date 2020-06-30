@@ -2,16 +2,17 @@
 % Please edit documentation in R/parse_roll_cmd.R
 \name{parse_roll_cmd}
 \alias{parse_roll_cmd}
-\title{Title}
+\title{A roll command parser}
 \usage{
 parse_roll_cmd(roll_cmd)
 }
 \arguments{
-\item{roll_cmd}{}
+\item{roll_cmd}{a string containing the roll command.}
 }
 \value{
-
+a list containing dice to roll and mathematical operators.
 }
 \description{
-Title
+The roll command parser transform a complex roll command into a set of
+individual rolls and operations.
 }

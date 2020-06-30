@@ -1,12 +1,10 @@
-#' Roll a die from text command
+#' Roll One
 #'
-#' @param roll a string corresponding to a roll command
+#' @description Roll one die from string command.
 #'
-#' @return result of the roll(s)
+#' @param roll a string corresponding to a roll command.
 #'
-#' @examples
-#' roll_one("1d6")
-#'
+#' @return result of the roll
 roll_one <- function(roll){
   for (r in roll_types) { # we try rolls patterns one by one
     detected = stringr::str_detect(roll,r$pattern)
