@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# RollR <img src='man/figures/logo.png' align="right" height="200" />
+# RollR <img src='man/figures/logo.png' align="right" height="150" />
 
 <!-- badges: start -->
 
