@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# RollR <img src='man/figures/logo.png' align="right" height="150" />
+# RollR <img src='man/figures/logo.png' align="right" height="200" />
 
 <!-- badges: start -->
 
@@ -12,8 +12,6 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 This R package provides a simple way to make all sorts of dice rolls
 using syntax inspired from tabletop roleplaying games like Dungeons &
 Dragons.
-
-Hex logo made by Sophie1000 ([Instagram](https://www.instagram.com/sophie1000___/), [website](https://sophie1000.com)).
 
 ## Installation
 

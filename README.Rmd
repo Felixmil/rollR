@@ -84,6 +84,8 @@ Probability distribution for 4d6h3 looks like this:
 ```{r, echo=FALSE,message=FALSE, warning=FALSE}
 library(magrittr)
 library(dplyr)
+library(ggplot2)
+library(emojifont)
 
 mode = tibble(r = random_rolls) %>%
   group_by(r) %>% 
@@ -96,27 +98,45 @@ mean = round(mean(all_results),2)
 
 ```
 
-```{r, echo=FALSE, fig.asp=0.68,fig.align='center',fig.retina=TRUE}
-density <- density(random_rolls,bw = 1)
+```{r, echo=FALSE, fig.width=8, fig.asp=0.68, fig.align='center', fig.retina=TRUE}
 
-{
-  plot(density, main = "Probability distribution for 4d6h3 dice roll", xlab='roll result')
-  abline(v = mode, col="black", lwd=3, lty=2)
-  }
+plot <- random_rolls %>%
+  tibble(r = .) %>%
+  ggplot(data=., aes(x=r)) +
+  geom_density(color="black",size=2,bw=1)+
+  geom_histogram(aes(y=..density..), 
+                 position='identity',
+                 binwidth = 1,
+                 fill="#AF0000", 
+                 color="white",
+                 alpha=0.8)+
+  geom_vline(xintercept = mode,
+             color="white", linetype="dashed", size=2)+
+  scale_x_continuous(breaks = seq(3,18,1))+
+  scale_y_continuous(expand = c(0,0))+
+  labs(title = "Probability distribution for 4d6h3 dice roll", 
+       x= "roll result",
+       y="probability density")+
+  theme_classic()+
+  theme(text = element_text(size=14),
+        plot.title = element_text(hjust = 0.5, size=14,face = 'bold'))
+
+plot +
+  geom_label(data = tibble(x=1), x=15.5, y = 0.11, label = '50% chance to get\n a score above 13',size=4, hjust=0)+
+  geom_label(data = tibble(x=1),x=9.5, y = 0.11, label = '50% chance to get\n a score below 13',size=4, hjust=1)
+  
 ```
 
-  
+
 Distribution's mode is **`r mode`**, however, the mean of our rolls is **`r mean`**:
-  
-  
-```{r, echo=FALSE, fig.asp=0.68,fig.align='center',fig.retina=TRUE}
-{
-  plot(density, 
-       main = "Our luck was below average :(", 
-       xlab='roll result')
-  abline(v = mode, col="black", lwd=3, lty=2) 
-  abline(v = mean, col="red")
-  }
+
+
+```{r, echo=FALSE, fig.width=8, fig.asp=0.68,fig.align='center',fig.retina=TRUE}
+emojifont::load.emojifont()
+plot +
+  geom_text(data= tibble(x=1),label= ":(", x= mean, y = 0.05, size=6)+
+  geom_segment(xend=1.05*mean, x=0.98*mode,y=0.05, yend=0.05,arrow = arrow(type = "closed"))+
+  labs(title="Our luck was below average...")
 ```
 
 
