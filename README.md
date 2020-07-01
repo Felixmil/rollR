@@ -13,7 +13,7 @@ This R package provides a simple way to make all sorts of dice rolls
 using syntax inspired from tabletop roleplaying games like Dungeons &
 Dragons.
 
-Hex logo made by [Sophie](sophie1000.com)
+Hex logo made by [Sophie](sophie1000.com).
 
 ## Installation
 
