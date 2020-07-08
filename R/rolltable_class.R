@@ -115,3 +115,56 @@ max.rolltable <- function(tbl, ..., na.rm = FALSE) {
   calculate(tbl, .summary_fn = "max")
 }
 
+#' Print a rolltable
+#'
+#' @param tbl A rolltable class.
+#' @param n Number of repetitions to print.
+#' @param rolls If TRUE, print the base rolls and modifications to rolls, such as keep highest or exploding.
+#' @param digits Round numbers to this number of digits when printing.
+print.rolltable <- function(tbl, n = 10, rolls = FALSE, digits = 2, ...) {
+  res <- mean(tbl)
+  repetitions <- nrow(tbl[[1]])
+
+  cat(attr(tbl, "command"), "\n")
+  cat("======\n")
+  cat(sprintf("Number of repetitions: %d\n", repetitions))
+
+  if(rolls) {
+    # basic format:
+    # ----------
+    # 1. 1d6 rolls: 3
+    # 1. 2d10h1 rolls: 10, 4
+    # 1. Keep Highest: 10, 4
+    # 1. 8d6! rolls: 5, 2, 4, 5, 3, 1, 3, 4
+    # 1. Exploding: 5, 2, 4, 5, 3, 1, 3, 4
+    # ----------
+
+    total_i <- min(repetitions, n)
+    iteration_s <- paste0("%0", ceiling(total_i / 10), "d")
+    for(i in seq_len(total_i)) {
+      cat("----------\n")
+      i_str <- sprintf(iteration_s, i)
+      for(d in seq_len(length(tbl))) {
+
+        cat(sprintf("%s. %s base rolls: %s\n", i_str, names(tbl)[[d]], paste(tbl[[d]]$Base.Roll[[i]], collapse = ", ")))
+
+        if(tbl[[d]]$Type[[i]] != "none" & tbl[[d]]$Type[[i]] != "simple") {
+          cat(sprintf("%s. %s: %s\n", i_str, stringr::str_to_title(tbl[[d]]$Type[[i]]), paste(tbl[[d]]$Base.Roll[[i]], collapse = ", ")))
+        }
+      }
+    }
+    if(total_i < repetitions) cat("...\n")
+
+  }
+
+  cat("======\n")
+  s <- paste0("Mean result: %s = %.", digits, "f\n")
+  cat(sprintf(s, trim_numeric_string(names(res), digits), res))
+
+
+}
+
+trim_numeric_string <- function(str, digits = 2) {
+  p <- sprintf("([[:digit:]]+[.])([[:digit:]]{%d})[[:digit:]]+", digits)
+  stringr::str_replace_all(str, pattern = p, replacement = "\\1\\2")
+}

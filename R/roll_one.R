@@ -159,6 +159,7 @@ detect_success_test <- function(die) {
   return(res[, -1, drop = FALSE])
 }
 
+# These should all probably be classes, or a single class with various values...
 none <- list(name = "none",
              pattern = "^\\d+$",
              calculate = function(base_roll, ...) { base_roll } )
