@@ -2,7 +2,7 @@
 % Please edit documentation in R/rolltable_class.R
 \name{roll}
 \alias{roll}
-\title{Method to roll one or more iterations of dice.}
+\title{Roll Method}
 \usage{
 roll(tbl, ...)
 }
@@ -17,5 +17,11 @@ roll(tbl, ...)
 An updated rolltable.
 }
 \description{
-Takes a rolltable and rolls to create a new set of results.
+Takes a rolltable and rolls to create a new set of results, using one or more repetitions.
+}
+\examples{
+
+tbl <- rolltable("2d20h1 + 20"); tbl
+roll(tbl, repetitions = 3)
+roll(tbl, repetitions = 2, verbose = TRUE)
 }

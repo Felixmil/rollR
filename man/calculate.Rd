@@ -18,3 +18,9 @@ A numeric vector whose names are the individual sums for each dice set.
 For each repetition in the rolltable, summarizes each dice set and
 applies the operators in turn.
 }
+\examples{
+
+tbl <- rolltable("2d20h1 + 20")
+calculate(tbl)
+calculate(tbl, .summary_fn = "median")
+}

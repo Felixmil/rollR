@@ -2,8 +2,7 @@
 % Please edit documentation in R/rolltable_class.R
 \name{min.rolltable}
 \alias{min.rolltable}
-\title{Determines the minimum over repetitions for the rolls.
-Calculates the total by applying the operators to each minimum.}
+\title{Min rolltable}
 \usage{
 \method{min}{rolltable}(tbl, ..., na.rm = FALSE)
 }

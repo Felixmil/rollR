@@ -2,8 +2,7 @@
 % Please edit documentation in R/rolltable_class.R
 \name{max.rolltable}
 \alias{max.rolltable}
-\title{Determines the maximum over repetitions for the rolls.
-Calculates the total by applying the operators to each maximum.}
+\title{Max rolltable}
 \usage{
 \method{max}{rolltable}(tbl, ..., na.rm = FALSE)
 }

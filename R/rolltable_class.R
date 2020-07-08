@@ -7,6 +7,11 @@
 #' @param repetitions Number of times to roll the command.
 #' @param verbose If TRUE, dice rolls details are visible in the console.
 #' @export
+#'
+#' @examples
+#' rolltable("2d20h1 + 20")
+#' rolltable("2d20h1 + 20", repetitions = 3)
+#' rolltable("2d20h1 + 20", verbose = TRUE)
 rolltable <- function(cmd, repetitions = 1, verbose = FALSE) {
   cmd <- tolower(cmd) # avoid needing to check for a bunch of capital letters
   parsed_cmd <- rollr:::parse_roll_cmd(cmd)
@@ -41,15 +46,21 @@ new_rolltable <- function(lst, cmd, dices, operators) {
   )
 }
 
-#' Method to roll one or more iterations of dice.
+#' Roll Method
 #'
-#' Takes a rolltable and rolls to create a new set of results.
+#' Takes a rolltable and rolls to create a new set of results, using one or more repetitions.
 #'
 #' @param tbl A rolltable class.
 #' @param repetitions Number of times to roll the command.
 #' @param verbose If TRUE, dice roll details are visible in the console.
 #' @return An updated rolltable.
 #' @export
+#'
+#' @examples
+#'
+#' tbl <- rolltable("2d20h1 + 20"); tbl
+#' roll(tbl, repetitions = 3)
+#' roll(tbl, repetitions = 2, verbose = TRUE)
 roll <- function(tbl, ...) { UseMethod("roll") }
 roll.rolltable <- function(tbl, repetitions = 1, verbose = FALSE) {
   lapply_fn <- ifelse(verbose, lapply, function(...) suppressMessages(lapply(...)))
@@ -70,6 +81,12 @@ roll.rolltable <- function(tbl, repetitions = 1, verbose = FALSE) {
 #' @param .summary_fn Function used to summarize results between repetitions. Default returns each repetition separately.
 #' @return A numeric vector whose names are the individual sums for each dice set.
 #' @export
+#'
+#' @examples
+#'
+#' tbl <- rolltable("2d20h1 + 20")
+#' calculate(tbl)
+#' calculate(tbl, .summary_fn = "median")
 calculate <- function(tbl, ...) { UseMethod("calculate") }
 calculate.rolltable <- function(tbl, .summary_fn = "identity") {
   out <- parse_result(tbl, operators = attr(tbl, "operators"), .summary_fn = get(.summary_fn))
@@ -78,20 +95,24 @@ calculate.rolltable <- function(tbl, .summary_fn = "identity") {
   out
 }
 
+#' Mean rolltable
+#'
 #' Determines the average over repetitions for the rolls.
 #' Calculates the total by applying the operators to each average.
 #'
-#' @param tbl A rolltable class.
+#' @param x A rolltable class.
 #' @return A numeric vector whose names are the individual means for each dice set.
 #' @export
 mean.rolltable <- function(x) {
   calculate(x, .summary_fn = "mean")
 }
 
+#' Median rolltable
+#'
 #' Determines the median over repetitions for the rolls.
 #' Calculates the total by applying the operators to each median value.
 #'
-#' @param tbl A rolltable class.
+#' @param x A rolltable class.
 #' @return A numeric vector whose names are the individual means for each dice set.
 #' @export
 median.rolltable <- function(x, na.rm = FALSE) {
@@ -100,6 +121,8 @@ median.rolltable <- function(x, na.rm = FALSE) {
 
 
 
+#' Min rolltable
+#'
 #' Determines the minimum over repetitions for the rolls.
 #' Calculates the total by applying the operators to each minimum.
 #'
@@ -110,6 +133,8 @@ min.rolltable <- function(tbl, ..., na.rm = FALSE) {
   calculate(tbl, .summary_fn = "min")
 }
 
+#' Max rolltable
+#'
 #' Determines the maximum over repetitions for the rolls.
 #' Calculates the total by applying the operators to each maximum.
 #'

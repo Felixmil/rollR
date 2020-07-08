@@ -2,13 +2,12 @@
 % Please edit documentation in R/rolltable_class.R
 \name{mean.rolltable}
 \alias{mean.rolltable}
-\title{Determines the average over repetitions for the rolls.
-Calculates the total by applying the operators to each average.}
+\title{Mean rolltable}
 \usage{
 \method{mean}{rolltable}(x)
 }
 \arguments{
-\item{tbl}{A rolltable class.}
+\item{x}{A rolltable class.}
 }
 \value{
 A numeric vector whose names are the individual means for each dice set.

@@ -17,3 +17,8 @@ rolltable(cmd, repetitions = 1, verbose = FALSE)
 Class used to store multiple dice rolls for a roll command.
 This function is the main helper, which sets up a new rolltable.
 }
+\examples{
+rolltable("2d20h1 + 20")
+rolltable("2d20h1 + 20", repetitions = 3)
+rolltable("2d20h1 + 20", verbose = TRUE)
+}

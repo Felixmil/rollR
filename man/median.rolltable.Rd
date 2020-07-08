@@ -2,13 +2,12 @@
 % Please edit documentation in R/rolltable_class.R
 \name{median.rolltable}
 \alias{median.rolltable}
-\title{Determines the median over repetitions for the rolls.
-Calculates the total by applying the operators to each median value.}
+\title{Median rolltable}
 \usage{
 \method{median}{rolltable}(x, na.rm = FALSE)
 }
 \arguments{
-\item{tbl}{A rolltable class.}
+\item{x}{A rolltable class.}
 }
 \value{
 A numeric vector whose names are the individual means for each dice set.
