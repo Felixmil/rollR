@@ -15,24 +15,25 @@
 #' roll_dice("1d4 * 2")
 #' roll_dice("2d20h1")
 #'
-roll_dice <- function(cmd, roll_history=FALSE) {
-  if (roll_history) {
-    message(paste0('Evaluating "', cmd,'" \n',
-                   '=========='))
+roll_dice <- function(cmd, roll_history=FALSE, repetitions = 1, verbose = FALSE) {
+  if(length(cmd) > 1) {
+    out <- lapply(cmd, roll_dice, roll_history = roll_history, repetitions = repetitions)
+    names(out) <- cmd
+    return(out)
   }
 
-  parsed_cmd <- parse_roll_cmd(cmd)
-  if (roll_history) {
-    result <- evaluate_roll_cmd(parsed_cmd)
-  } else {
-    result <- suppressMessages(evaluate_roll_cmd(parsed_cmd))
+  tbl <- rolltable(cmd, repetitions = repetitions, verbose = verbose)
+  result <- calculate(tbl)
+
+  if(verbose) {
+    message(paste('==========\n',
+                  "Result is", result))
   }
 
-  if (roll_history) {
-  message(paste('==========\n',
-            "Result is", result))
+  if(roll_history) {
+    return(list(result = result,
+                roll_history = tbl))
   }
 
   return(result)
-
 }
