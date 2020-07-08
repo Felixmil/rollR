@@ -26,8 +26,13 @@ roll_dice <- function(cmd, roll_history=FALSE, repetitions = 1, verbose = FALSE)
   result <- calculate(tbl)
 
   if(verbose) {
-    message(paste('==========\n',
-                  "Result is", result))
+    message('==========')
+    iteration_s <- paste0("%0", ceiling(length(result) / 10), "d")
+    for(i in seq_along(result)) {
+      i_str <- sprintf(iteration_s, i)
+      message(sprintf("%s. Result is %d", i_str, result[[i]]))
+    }
+
   }
 
   if(roll_history) {

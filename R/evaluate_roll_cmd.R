@@ -40,23 +40,27 @@ roll_set <- function(parsed_cmd, repetitions) {
               result = result))
 }
 
-parse_result <- function(calculated_dice_tbls, operators = NULL, .summary_fn = identity) {
+parse_result <- function(calculated_dice_tbls, operators = character(0), .summary_fn = identity) {
   # result is a list one longer than operators
   # Each result element is a table with 1 or more rows for a single set of dice rolls
   # first choose either the calculated roll or success if available, and sum
   out <- sapply(calculated_dice_tbls, function(tbl) {
     out <- tbl$Calculated.Roll
-    out[!is.na(tbl$Success.Outcome)] <- tbl$Success.Outcome
+
+    idx <- sapply(calculated_dice_tbls$Success.Outcome, is.null)
+    out[!idx] <- tbl$Success.Outcome[!idx]
     return(sapply(out, sum, na.rm = TRUE))
   })
 
-  out <- apply(out, 2, .summary_fn)
   if(is.null(dim(out))) dim(out) <- c(1, length(out))
+  out <- apply(out, 2, .summary_fn)
 
-  if(!is.null(operators)) {
+
+  if(length(operators) > 0) {
+    if(is.null(dim(out))) dim(out) <- c(1, length(out))
     # now apply the operators to each
     text <- paste(out[,1])
-    for(i in 2:length(result)) {
+    for(i in 2:ncol(out)) {
       text <- paste(text, operators[i-1], out[, i])
     }
     out <- sapply(text, function(txt) { eval(parse(text = txt)) } )

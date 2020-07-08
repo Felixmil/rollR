@@ -52,9 +52,10 @@ new_rolltable <- function(lst, cmd, dices, operators) {
 #' @export
 roll <- function(tbl, ...) { UseMethod("roll") }
 roll.rolltable <- function(tbl, repetitions = 1, verbose = FALSE) {
-  fn <- ifelse(verbose, lapply, function(...) suppressMessages(lapply(...)))
-  rollhist <- fn(tbl, function(tbl, n) { do.call(rbind, replicate(n, calculate_dice_table(tbl), simplify = FALSE)) },
-                     n = repetitions)
+  lapply_fn <- ifelse(verbose, lapply, function(...) suppressMessages(lapply(...)))
+
+  rollhist <- lapply_fn(tbl, function(df, n) { df[rep(1, times = n), , drop = FALSE] }, n = repetitions)
+  rollhist <- lapply_fn(rollhist, rollr:::calculate_dice_table)
 
   # lapply strips class, so add back.
   new_rolltable(rollhist, cmd = attr(tbl, "command"), dices = attr(tbl, "dices"), operators = attr(tbl, "operators"))
@@ -82,6 +83,7 @@ calculate.rolltable <- function(tbl, .summary_fn = "identity") {
 #'
 #' @param tbl A rolltable class.
 #' @return A numeric vector whose names are the individual means for each dice set.
+#' @export
 mean.rolltable <- function(x) {
   calculate(x, .summary_fn = "mean")
 }
@@ -91,6 +93,7 @@ mean.rolltable <- function(x) {
 #'
 #' @param tbl A rolltable class.
 #' @return A numeric vector whose names are the individual means for each dice set.
+#' @export
 median.rolltable <- function(x, na.rm = FALSE) {
   calculate(x, .summary_fn = "median")
 }
@@ -102,6 +105,7 @@ median.rolltable <- function(x, na.rm = FALSE) {
 #'
 #' @param tbl A rolltable class.
 #' @return A numeric vector whose names are the individual minimums for each dice set.
+#' @export
 min.rolltable <- function(tbl, ..., na.rm = FALSE) {
   calculate(tbl, .summary_fn = "min")
 }
@@ -111,6 +115,7 @@ min.rolltable <- function(tbl, ..., na.rm = FALSE) {
 #'
 #' @param tbl A rolltable class.
 #' @return A numeric vector whose names are the individual maximums for each dice set.
+#' @export
 max.rolltable <- function(tbl, ..., na.rm = FALSE) {
   calculate(tbl, .summary_fn = "max")
 }
@@ -121,6 +126,7 @@ max.rolltable <- function(tbl, ..., na.rm = FALSE) {
 #' @param n Number of repetitions to print.
 #' @param rolls If TRUE, print the base rolls and modifications to rolls, such as keep highest or exploding.
 #' @param digits Round numbers to this number of digits when printing.
+#' @export
 print.rolltable <- function(tbl, n = 10, rolls = FALSE, digits = 2, ...) {
   res <- mean(tbl)
   repetitions <- nrow(tbl[[1]])
@@ -149,7 +155,7 @@ print.rolltable <- function(tbl, n = 10, rolls = FALSE, digits = 2, ...) {
         cat(sprintf("%s. %s base rolls: %s\n", i_str, names(tbl)[[d]], paste(tbl[[d]]$Base.Roll[[i]], collapse = ", ")))
 
         if(tbl[[d]]$Type[[i]] != "none" & tbl[[d]]$Type[[i]] != "simple") {
-          cat(sprintf("%s. %s: %s\n", i_str, stringr::str_to_title(tbl[[d]]$Type[[i]]), paste(tbl[[d]]$Base.Roll[[i]], collapse = ", ")))
+          cat(sprintf("%s. %s: %s\n", i_str, stringr::str_to_title(tbl[[d]]$Type[[i]]), paste(tbl[[d]]$Calculated.Roll[[i]], collapse = ", ")))
         }
       }
     }
@@ -164,6 +170,7 @@ print.rolltable <- function(tbl, n = 10, rolls = FALSE, digits = 2, ...) {
 
 }
 
+#' Helper function to change the number of digits for a string with numerals
 trim_numeric_string <- function(str, digits = 2) {
   p <- sprintf("([[:digit:]]+[.])([[:digit:]]{%d})[[:digit:]]+", digits)
   stringr::str_replace_all(str, pattern = p, replacement = "\\1\\2")

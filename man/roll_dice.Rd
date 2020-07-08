@@ -4,7 +4,7 @@
 \alias{roll_dice}
 \title{Roll Dice}
 \usage{
-roll_dice(cmd, roll_history = FALSE)
+roll_dice(cmd, roll_history = FALSE, repetitions = 1, verbose = FALSE)
 }
 \arguments{
 \item{cmd}{character string describing the dice roll to compute.}

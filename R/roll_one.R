@@ -19,9 +19,14 @@ roll_one <- function(roll){
 
 # die <- tolower(c("1d6", "10d6", "20d20", "10", "2d20h1", "3d10h2", "2d20l1", "1d20r1",  "3d6!", "2d6>=5", "4d6=5", "4dF", "1d10!>9", "3d10!>=8", "1d10t10"))
 
+construct_dice_table <- function(die) {
+  cbind(Die = die,
+        detect_dice(die),
+        detect_dice_type(die),
+        detect_success_test(die))
+}
 
-
-calculate_dice_table <- function(dice_tbl) {
+calculate_dice_table <- function(dice_tbl, verbose = FALSE) {
   dice_tbl <- roll_base_dice(dice_tbl)
   dice_tbl <- calculate_types(dice_tbl)
   dice_tbl <- calculate_successes(dice_tbl)
@@ -49,51 +54,46 @@ roll_base_dice <- function(dice_tbl) {
                                             SIMPLIFY = FALSE,
                                             MoreArgs = list(x = c(-1, 0, 1)))
 
-
-
-  # message(sprintf("rolls: \n%s",
-  #                 sprintf("\t%001d")
-  #                 )
-  #
-  #   'rolls: ',
-  #
-  #         paste(rolls, collapse = ', '))
+  iteration_s <- paste0("%0", ceiling(nrow(dice_tbl) / 10), "d")
+  for(i in seq_len(nrow(dice_tbl))) {
+    i_str <- sprintf(iteration_s, i)
+    message(sprintf("%s. %s Base roll(s): %s", i_str, dice_tbl$Die[[i]], paste(dice_tbl$Base.Roll[[i]], collapse = ", ")))
+  }
 
   return(dice_tbl)
 }
 
 calculate_types <- function(dice_tbl) {
-  dice_tbl$Calculated.Roll <- NA
+  dice_tbl$Calculated.Roll <- vector("list", nrow(dice_tbl))
 
-  type.lst <- c(dice_modification_types, list(simple = simple, none = none))
-  for(type in dice_tbl$Type) {
-    type_idx <- dice_tbl$Type == type
-
-    if(any(type_idx)) {
-      calculation_fn <- type.lst[[type]]$calculate
-      dice_tbl$Calculated.Roll[type_idx] <- mapply(calculation_fn,
-                                               base_roll = dice_tbl$Base.Roll[type_idx],
-                                               match = dice_tbl$Type.Match[type_idx],
-                                               sides = dice_tbl$Sides[type_idx],
-                                               SIMPLIFY = FALSE)
+  iteration_s <- paste0("%0", ceiling(nrow(dice_tbl) / 10), "d")
+  for(i in seq_len(nrow(dice_tbl))) {
+    type <- dice_tbl$Type[[i]]
+    if(type %in% names(dice_modification_types)) {
+      i_str <- sprintf(iteration_s, i)
+      calculation_fn <- dice_modification_types[[type]]$calculate
+      dice_tbl$Calculated.Roll[[i]] <- calculation_fn(base_roll = dice_tbl$Base.Roll[[i]],
+                                                      match = dice_tbl$Type.Match[[i]],
+                                                      sides = dice_tbl$Sides[[i]],
+                                                      i_str = i_str)
     }
   }
+
   return(dice_tbl)
 }
 
 calculate_successes <- function(dice_tbl) {
-  dice_tbl$Success.Outcome <- NA
-  type.lst <- c(dice_modification_types, list(simple = simple, none = none))
+  dice_tbl$Success.Outcome <- vector("list", nrow(dice_tbl))
 
-  for(success_type in success_types) {
-    type_idx <- dice_tbl$Success == success_type$name & !is.na(dice_tbl$Success)
-
-    if(any(type_idx)) {
-      calculation_fn <- success_type$calculate
-      dice_tbl$Success.Outcome[type_idx] <- mapply(calculation_fn,
-                                                   base_roll = dice_tbl$Calculated.Roll[type_idx],
-                                                   match = dice_tbl$Success.Match[type_idx],
-                                                   SIMPLIFY = FALSE)
+  iteration_s <- paste0("%0", ceiling(nrow(dice_tbl) / 10), "d")
+  for(i in seq_len(nrow(dice_tbl))) {
+    type <- dice_tbl$Success[[i]]
+    if(dice_tbl$Success[[i]] %in% names(success_types) & !is.na(dice_tbl$Success[[i]])) {
+      i_str <- sprintf(iteration_s, i)
+      calculation_fn <- success_type[[type]]$calculate
+      dice_tbl$Calculated.Roll[[i]] <- calculation_fn(base_roll = dice_tbl$Calculated.Roll[[i]],
+                                                      match = dice_tbl$Success.Match[[i]],
+                                                      i_str = i_str)
     }
   }
   return(dice_tbl)
@@ -174,44 +174,64 @@ SIMPLE_DIE_PATTERN <- paste(simple$pattern, none$pattern, sep = "|")
 # dots in the calculate argument permit additional arguments to be passed to some of the functions; otherwise ignored.
 keep_h <- list(name = "keep highest",
               pattern = "^\\d+d\\d+h(\\d+)",
-              calculate = function(base_roll, match, ...) { sort(base_roll, decreasing = TRUE)[1:as.integer(match)] })
+              calculate = function(base_roll, match, i_str = "1", ...) {
+                out <- sort(base_roll, decreasing = TRUE)[1:as.integer(match)]
+                message(i_str, '. keeping ', match, " highest(s): ", paste(out[1:as.integer(match)], collapse = ', '))
+                return(out)
+                })
 
 keep_l <- list(name = "keep lowest",
               pattern = "^\\d+d\\d+l(\\d+)",
-              calculate = function(base_roll, match, ...) { sort(base_roll, decreasing = FALSE)[1:as.integer(match)] })
+              calculate = function(base_roll, match, i_str = "1", ...) {
+                out <- sort(base_roll, decreasing = FALSE)[1:as.integer(match)]
+                message(i_str, '. keeping ', match, " lowest(s): ", paste(out[1:as.integer(match)], collapse = ', '))
+                return(out)
+                })
 
 reroll <- list(name = "reroll",
                pattern = "^\\d+d\\d+r(\\d+)",
-               calculate = function(base_roll, match, sides, ...) {
+               calculate = function(base_roll, match, sides, i_str = "1", ...) {
                  sides <- as.integer(sides)
                  match <- as.integer(match)
                  idx <- base_roll == match
                  if(any(idx)) {
                    base_roll[idx] <- sample.int(sides, size = sum(idx), replace = TRUE)
+                   message(i_str, '. rerolling ', sum(idx), ' dice: ', paste(base_roll[idx], collapse = ', '))
+                   return(out)
+
                  }
                  return(base_roll)
                })
 
 double <- list(name = "double",
                pattern = "^\\d+d\\d+t(\\d+)",
-               calculate = function(base_roll, match, ...) {
+               calculate = function(base_roll, match, i_str = "1", ...) {
                  match <- as.integer(match)
                  idx <- base_roll == match
                  if(any(idx)) {
+                   message(i_str, '. doubling ', sum(idx), ' dice: ', paste(base_roll[idx], collapse = ', '))
                    base_roll <- c(base_roll, rep.int(match, times = sum(idx)))
+
                  }
                  return(base_roll)
                })
 
 exploding <- list(name = "exploding",
                   pattern = "^\\d+[dD]\\d+\\!(?:[>](\\d+))?",
-                  calculate = function(base_roll, match, sides, ...) {
+                  calculate = function(base_roll, match, sides, i_str = "1", ...) {
                     match <- as.integer(match)
                     sides <- as.integer(sides)
-                    explode_test <- ifelse(is.na(match), sides, match:sides)
+                    if(is.na(match)) {
+                      explode_test <- sides
+                    } else {
+                      explode_test <- match:sides
+                    }
+                    stopifnot(length(explode_test) < sides) # don't want an infinite loop where every die result explodes
+
                     num_exploded <- sum(base_roll %in% explode_test)
                     while(num_exploded > 0) {
                       new_roll <- sample.int(sides, size = num_exploded, replace = TRUE)
+                      message(i_str, ". exploding ", num_exploded, " dice. New roll(s): ", paste(new_roll, collapse = ", "))
                       num_exploded <- sum(new_roll %in% explode_test)
                       base_roll <- c(base_roll, new_roll)
                     }
@@ -224,10 +244,18 @@ names(dice_modification_types) <- sapply(dice_modification_types, function(x) x$
 
 ge_success <- list(name = "success ge",
                    pattern = "[>][=](\\d+)$",
-                   calculate = function(base_roll, match, ...) { sum(base_roll >= as.integer(match)) })
+                   calculate = function(base_roll, match, i_str = "1", ...) {
+                     out <- sum(base_roll >= as.integer(match))
+                     message(i_str, ". Number of successes: ", out)
+                     out
+                     })
 equal_success <- list(name = "success equal",
                       pattern = "[^>][=](\\d+)$",
-                      calculate = function(base_roll, match, ...) { sum(base_roll == as.integer(match)) })
+                      calculate = function(base_roll, match, i_str = "1", ...) {
+                        sum(base_roll == as.integer(match))
+                        message(i_str, ". Number of successes: ", out)
+                        out
+                        })
 success_types <- list(ge_success, equal_success)
 names(success_types) <- sapply(success_types, function(x) x$name)
 
