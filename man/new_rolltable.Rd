@@ -4,7 +4,7 @@
 \alias{new_rolltable}
 \title{Constructor for rolltable}
 \usage{
-new_rolltable(lst, cmd, dices, operators)
+new_rolltable(cmd, tbl)
 }
 \description{
 Internal function to build the rolltable class structure.

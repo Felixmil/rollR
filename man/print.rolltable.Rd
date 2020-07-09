@@ -4,7 +4,7 @@
 \alias{print.rolltable}
 \title{Print a rolltable}
 \usage{
-\method{print}{rolltable}(tbl, n = 10, rolls = FALSE, digits = 2, ...)
+\method{print}{rolltable}(tbl, n = 10, rolls = FALSE, digits = 1, ...)
 }
 \arguments{
 \item{tbl}{A rolltable class.}

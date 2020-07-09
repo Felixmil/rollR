@@ -21,15 +21,17 @@ roll_one <- function(roll){
 
 construct_dice_table <- function(die) {
   cbind(Die = die,
-        detect_dice(die),
-        detect_dice_type(die),
-        detect_success_test(die))
+        Repetition = 1,
+        rollr:::detect_dice(die),
+        rollr:::detect_dice_type(die),
+        rollr:::detect_success_test(die),
+        stringsAsFactors = FALSE)
 }
 
 calculate_dice_table <- function(dice_tbl, verbose = FALSE) {
-  dice_tbl <- roll_base_dice(dice_tbl)
-  dice_tbl <- calculate_types(dice_tbl)
-  dice_tbl <- calculate_successes(dice_tbl)
+  dice_tbl <- rollr:::roll_base_dice(dice_tbl)
+  dice_tbl <- rollr:::calculate_types(dice_tbl)
+  dice_tbl <- rollr:::calculate_successes(dice_tbl)
   return(dice_tbl)
 }
 
@@ -70,12 +72,16 @@ calculate_types <- function(dice_tbl) {
   for(i in seq_len(nrow(dice_tbl))) {
     type <- dice_tbl$Type[[i]]
     if(type %in% names(dice_modification_types)) {
+      # modify the base roll in some fashion
       i_str <- sprintf(iteration_s, i)
       calculation_fn <- dice_modification_types[[type]]$calculate
       dice_tbl$Calculated.Roll[[i]] <- calculation_fn(base_roll = dice_tbl$Base.Roll[[i]],
                                                       match = dice_tbl$Type.Match[[i]],
                                                       sides = dice_tbl$Sides[[i]],
                                                       i_str = i_str)
+    } else {
+      # no modification required; use the base roll
+      dice_tbl$Calculated.Roll[[i]] <- dice_tbl$Base.Roll[[i]]
     }
   }
 
@@ -83,15 +89,15 @@ calculate_types <- function(dice_tbl) {
 }
 
 calculate_successes <- function(dice_tbl) {
-  dice_tbl$Success.Outcome <- vector("list", nrow(dice_tbl))
+  dice_tbl$Success.Outcome <- NA
 
   iteration_s <- paste0("%0", ceiling(nrow(dice_tbl) / 10), "d")
   for(i in seq_len(nrow(dice_tbl))) {
     type <- dice_tbl$Success[[i]]
-    if(dice_tbl$Success[[i]] %in% names(success_types) & !is.na(dice_tbl$Success[[i]])) {
+    if(dice_tbl$Success[[i]] %in% names(rollr:::success_types) & !is.na(dice_tbl$Success[[i]])) {
       i_str <- sprintf(iteration_s, i)
-      calculation_fn <- success_type[[type]]$calculate
-      dice_tbl$Calculated.Roll[[i]] <- calculation_fn(base_roll = dice_tbl$Calculated.Roll[[i]],
+      calculation_fn <- rollr:::success_types[[type]]$calculate
+      dice_tbl$Success.Outcome[[i]] <- calculation_fn(base_roll = dice_tbl$Calculated.Roll[[i]],
                                                       match = dice_tbl$Success.Match[[i]],
                                                       i_str = i_str)
     }
