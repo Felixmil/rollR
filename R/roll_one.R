@@ -258,7 +258,7 @@ ge_success <- list(name = "success ge",
 equal_success <- list(name = "success equal",
                       pattern = "[^>][=](\\d+)$",
                       calculate = function(base_roll, match, i_str = "1", ...) {
-                        sum(base_roll == as.integer(match))
+                        out <- sum(base_roll == as.integer(match))
                         message(i_str, ". Number of successes: ", out)
                         out
                         })
