@@ -17,14 +17,15 @@ roll_one <- function(roll){
   warning("This roll command is not recognized")
 }
 
+# should be able to handle all of the following, in one go
 # die <- tolower(c("1d6", "10d6", "20d20", "10", "2d20h1", "3d10h2", "2d20l1", "1d20r1",  "3d6!", "2d6>=5", "4d6=5", "4dF", "1d10!>9", "3d10!>=8", "1d10t10"))
 
 construct_dice_table <- function(die) {
   cbind(Die = die,
         Repetition = 1,
         rollr:::detect_dice(die),
-        rollr:::detect_dice_type(die),
-        rollr:::detect_success_test(die),
+        rollr:::detect_dice_type(die)[,-1], # lose the Die column
+        rollr:::detect_success_test(die)[,-1], # lose the Die column
         stringsAsFactors = FALSE)
 }
 
@@ -119,65 +120,75 @@ detect_dice <- function(die) {
 detect_dice_type <- function(die) {
   res <- data.frame(Die = die, stringsAsFactors = FALSE)
   res$Type <- NA
-  res$Type.Match <- NA
+  res$Type.Match <- vector("list", length(die)) # to accommodate patterns that return multiple sub-matches
 
-  for(r in dice_modification_types) {
+  for(r in rollr:::dice_modification_types) {
     idx <- stringr::str_detect(die, pattern = r$pattern)
-    if(any(idx)) {
-      res$Type[idx] <- r$name
-
-      # match, but lose the initial repetition of the full pattern
-      match_fn <- function(string, pattern) {
-        stringr::str_match(string = string, pattern = pattern)[, -1]
-      }
-      res$Type.Match[idx] <- mapply(match_fn, string = die[idx], pattern = r$pattern, SIMPLIFY = FALSE)
-    }
+    if(any(idx)) res$Type[idx] <- r$name
   }
 
   # rest should be simple or none
-  idx <- stringr::str_detect(res$Die[is.na(res$Type)], simple$pattern)
-  res$Type[is.na(res$Type)][idx] <- simple$name
+  idx <- stringr::str_detect(res$Die[is.na(res$Type)], rollr:::simple$pattern)
+  res$Type[is.na(res$Type)][idx] <- rollr:::simple$name
 
-  idx <- stringr::str_detect(res$Die[is.na(res$Type)], none$pattern)
-  res$Type[is.na(res$Type)][idx] <- none$name
+  idx <- stringr::str_detect(res$Die[is.na(res$Type)], rollr:::none$pattern)
+  res$Type[is.na(res$Type)][idx] <- rollr:::none$name
 
   stopifnot(!anyNA(res$Type))
-  return(res[, -1, drop = FALSE])
+
+  # match the pattern
+  # Could probably do in the previous loop by modification type (and would be faster), but a bit easier to control here.
+  # pattern can return more than one item; should be converted to a character vector
+  for(i in seq_len(length(die))) {
+    mod_type <- res$Type[[i]]
+    if(mod_type %in% c(simple$name, none$name)) next;
+    # if(is.na(mod_type)) next; # should not actually occur, as simple or none should pick up everything else
+
+    pattern <- rollr:::dice_modification_types[[mod_type]]$pattern
+    res$Type.Match[[i]] <- stringr::str_match(string = res$Die[[i]], pattern = pattern)[,-1]
+  }
+
+  return(res)
 }
 
 detect_success_test <- function(die) {
   res <- data.frame(Die = die, stringsAsFactors = FALSE)
   res$Success <- NA
-  res$Success.Match <- NA
+  res$Success.Match <- vector("list", length(die)) # to accommodate patterns that return multiple sub-matches
 
-  for(s in success_types) {
+  for(s in rollr:::success_types) {
     idx <- stringr::str_detect(die, s$pattern)
-    if(any(idx)) {
-    res$Success[idx] <- s$name
-    match_fn <- function(string, pattern) {
-      stringr::str_match(string = string, pattern = pattern)[, -1]
-    }
-
-    res$Success.Match[idx] <- mapply(match_fn, string = die[idx], pattern = s$pattern, SIMPLIFY = FALSE)
-    }
+    if(any(idx)) res$Success[idx] <- s$name
   }
 
-  return(res[, -1, drop = FALSE])
+  for(i in seq_len(length(die))) {
+    s_type <- res$Success[[i]]
+    if(is.na(s_type)) next;
+    pattern <- rollr:::success_types[[s_type]]$pattern
+    res$Success.Match[[i]] <- stringr::str_match(string = res$Die[[i]], pattern = pattern)[, -1]
+  }
+
+  return(res)
 }
 
 # These should all probably be classes, or a single class with various values...
+# Simple die patterns ####
+# • None ####
 none <- list(name = "none",
              pattern = "^\\d+$",
              calculate = function(base_roll, ...) { base_roll } )
 
+# • Simple ####
 simple <- list(name = "simple",
                pattern = "^(\\d+)d(\\d+|f)",
                calculate = function(base_roll, ...) { base_roll } )
 
 SIMPLE_DIE_PATTERN <- paste(simple$pattern, none$pattern, sep = "|")
 
+# Modification patterns ####
 # don't use $ to close the pattern as the pattern may also contain success test
 # dots in the calculate argument permit additional arguments to be passed to some of the functions; otherwise ignored.
+# • Keep highest ####
 keep_h <- list(name = "keep highest",
               pattern = "^\\d+d\\d+h(\\d+)",
               calculate = function(base_roll, match, i_str = "1", ...) {
@@ -186,6 +197,7 @@ keep_h <- list(name = "keep highest",
                 return(out)
                 })
 
+# • Keep lowest ####
 keep_l <- list(name = "keep lowest",
               pattern = "^\\d+d\\d+l(\\d+)",
               calculate = function(base_roll, match, i_str = "1", ...) {
@@ -194,6 +206,7 @@ keep_l <- list(name = "keep lowest",
                 return(out)
                 })
 
+# • Reroll ####
 reroll <- list(name = "reroll",
                pattern = "^\\d+d\\d+r(\\d+)",
                calculate = function(base_roll, match, sides, i_str = "1", ...) {
@@ -203,12 +216,11 @@ reroll <- list(name = "reroll",
                  if(any(idx)) {
                    base_roll[idx] <- sample.int(sides, size = sum(idx), replace = TRUE)
                    message(i_str, '. rerolling ', sum(idx), ' dice: ', paste(base_roll[idx], collapse = ', '))
-                   return(out)
-
                  }
                  return(base_roll)
                })
 
+# • Double ####
 double <- list(name = "double",
                pattern = "^\\d+d\\d+t(\\d+)",
                calculate = function(base_roll, match, i_str = "1", ...) {
@@ -217,28 +229,40 @@ double <- list(name = "double",
                  if(any(idx)) {
                    message(i_str, '. doubling ', sum(idx), ' dice: ', paste(base_roll[idx], collapse = ', '))
                    base_roll <- c(base_roll, rep.int(match, times = sum(idx)))
-
                  }
                  return(base_roll)
                })
 
+# • Exploding ####
 exploding <- list(name = "exploding",
-                  pattern = "^\\d+d\\d+\\!(?:[>](\\d+))?",
+                  #pattern = "^\\d+d\\d+\\!(?:((?:>=|<=|>|<|=)\\d+))?",
+                  pattern = "^\\d+d\\d+\\!(?:(>=|<=|>|<|=)(\\d+))?",
                   calculate = function(base_roll, match, sides, i_str = "1", ...) {
-                    match <- as.integer(match)
+                    stopifnot(length(match) == 2)
+                    sym <- match[[1]]
+                    test_num <- as.integer(match[[2]])
                     sides <- as.integer(sides)
-                    if(is.na(match)) {
-                      explode_test <- sides
-                    } else {
-                      explode_test <- match:sides
-                    }
-                    stopifnot(length(explode_test) < sides) # don't want an infinite loop where every die result explodes
 
-                    num_exploded <- sum(base_roll %in% explode_test)
+                    if(is.na(test_num)) {
+                      # explode if the die equals the highest potential roll
+                      test_num <- sides
+                      FUN <- get("==", envir = parent.frame(), mode = "function")
+                    } else {
+                      # test could be >=, <=, >, <, or =
+                      # = must be converted to ==
+                      stopifnot(sym %in% c(">=", "<=", ">", "<", "="))
+                      if(sym == "=") sym <- "=="
+                      FUN <- get(sym, envir = parent.frame(), mode = "function")
+
+                      if(sym == ">=" && test_num == 1) stop("Exploding would cause an infinite loop.")
+                      if(sym == "<=" && test_num == sides) stop("Exploding would cause an infinite loop.")
+                    }
+
+                    num_exploded <- sum(FUN(base_roll, test_num))
                     while(num_exploded > 0) {
                       new_roll <- sample.int(sides, size = num_exploded, replace = TRUE)
                       message(i_str, ". exploding ", num_exploded, " dice. New roll(s): ", paste(new_roll, collapse = ", "))
-                      num_exploded <- sum(new_roll %in% explode_test)
+                      num_exploded <- sum(FUN(new_roll, test_num))
                       base_roll <- c(base_roll, new_roll)
                     }
                     return(base_roll)
@@ -247,16 +271,23 @@ exploding <- list(name = "exploding",
 dice_modification_types <- list(keep_h, keep_l, reroll, double, exploding)
 names(dice_modification_types) <- sapply(dice_modification_types, function(x) x$name)
 
-
+# Success patterns ####
+# • Greater/Less Than ####
 ge_success <- list(name = "success ge",
-                   pattern = "[>][=](\\d+)$",
+                   pattern = "[^!]([><][=]?)(\\d+)$",
                    calculate = function(base_roll, match, i_str = "1", ...) {
-                     out <- sum(base_roll >= as.integer(match))
+                     stopifnot(length(match) == 2,
+                               match[[1]] %in% c(">=", "<=", ">", "<"))
+                     test_num <- as.integer(match[[2]])
+                     FUN <- get(match[[1]], envir = parent.frame(), mode = "function")
+                     out <- sum(FUN(base_roll, test_num))
                      message(i_str, ". Number of successes: ", out)
                      out
                      })
+
+# • Equality ####
 equal_success <- list(name = "success equal",
-                      pattern = "[^>][=](\\d+)$",
+                      pattern = "[^!><][=](\\d+)$",
                       calculate = function(base_roll, match, i_str = "1", ...) {
                         out <- sum(base_roll == as.integer(match))
                         message(i_str, ". Number of successes: ", out)
@@ -264,107 +295,3 @@ equal_success <- list(name = "success equal",
                         })
 success_types <- list(ge_success, equal_success)
 names(success_types) <- sapply(success_types, function(x) x$name)
-
-# no_dice = list(pattern = "^\\d+$",
-#                compute = function(match) {
-#                  result = match[1]
-#                  return(result)
-#                })
-#
-# simple = list(pattern = "^(\\d+)[dD](\\d+)$",
-#               compute = function(match) {
-#                 n = match[2]
-#                 sides = match[3]
-#                 rolls = sample(1:sides, n, replace = TRUE)
-#                 message('rolls: ', paste(rolls, collapse = ', '))
-#                 result = sum(rolls)
-#               })
-#
-# keep_h = list(pattern = "^(\\d+)[dD](\\d+)[Hh](\\d+)$",
-#               compute = function(match) {
-#                 n = match[2]
-#                 sides = match[3]
-#                 kept = match[4]
-#                 rolls = sample(1:sides, n, replace = TRUE)
-#                 message('rolls: ', paste(rolls, collapse = ', '))
-#                 kept_dice = sort(rolls, decreasing = T)[1:as.numeric(kept)]
-#                 message('keeping ',kept, " highest(s): ", paste(kept_dice, collapse = ', '))
-#                 result =  sum(kept_dice)
-#               })
-#
-# keep_l = list(pattern = "^(\\d+)[dD](\\d+)[Ll](\\d+)$",
-#               compute = function(match) {
-#                 n = match[2]
-#                 sides = match[3]
-#                 kept = match[4]
-#                 rolls = sample(1:sides, n, replace = TRUE)
-#                 message('rolls: ', paste(rolls, collapse = ', '))
-#                 kept_dice = sort(rolls)[1:as.numeric(kept)]
-#                 message('keeping ',kept, " lowest(s): ", paste(kept_dice, collapse = ', '))
-#                 result =  sum(kept_dice)
-#               })
-#
-# exploding = list(pattern ="^(\\d+)[dD](\\d+)\\!$",
-#                  compute = function(match) {
-#                   n = match[2]
-#                   sides = match[3]
-#                   rolls = sample(1:sides, n, replace = TRUE)
-#                   explode = rolls[rolls == sides]
-#                   message('rolls: ', paste(rolls, collapse = ', '))
-#                   message("exploding ", length(explode),' dice...')
-#                   while (length(explode) != 0) {
-#                     new_rolls = sample(1:sides, length(explode), replace = TRUE)
-#                     message('new rolls : ', paste(new_rolls, collapse = ', '))
-#                     rolls = c(rolls, new_rolls)
-#                     explode = new_rolls[new_rolls==sides]
-#                     if (length(explode) != 0) { message("exploding ", length(explode),' dice...') }
-#                   }
-#                   result = sum(rolls)
-#                  })
-#
-# reroll = list(pattern = "^(\\d+)[dD](\\d+)[rR](\\d+)$",
-#               compute = function(match) {
-#                 n = match[2]
-#                 sides = match[3]
-#                 to_reroll = match[4]
-#                 rolls = sample(1:sides, n, replace = TRUE)
-#                 message('rolls: ', paste(rolls, collapse = ', '))
-#                 reroll = rolls[rolls == to_reroll]
-#                 message("rerolling ",length(reroll),' dice')
-#                 while (length(reroll) != 0) {
-#                   new_rolls = sample(1:sides, length(reroll), replace = TRUE)
-#                   message('new rolls : ', paste(new_rolls, collapse = ', '))
-#                   rolls[rolls == to_reroll] = new_rolls
-#                   reroll = rolls[rolls == to_reroll]
-#                   if (length(reroll) != 0) { message("rerolling ",length(reroll),' dice')}
-#                 }
-#                 result = sum(rolls)
-#               })
-#
-# success = list(pattern = "^(\\d+)[dD](\\d+) ?([<>]?=?) ?(\\d+)$",
-#                compute = function(match) {
-#                  n = match[2]
-#                  sides = match[3]
-#                  comparator = match[4]
-#                  if (comparator == "=") {comparator="=="}
-#                  threshold = match[5]
-#                  rolls = sample(1:sides, n, replace = TRUE)
-#                  message('rolls: ', paste(rolls, collapse = ', '))
-#                  success = eval(parse(text = paste("rolls[rolls",comparator,"threshold]")))
-#                  result = length(success)
-#                  message('number of success: ',
-#                          result ,
-#                          ' (', paste(sort(success,decreasing = TRUE), collapse = ', '),')')
-#                  return(result)
-#                  })
-#
-# roll_types = list(
-#   no_dice = no_dice,
-#   simple = simple,
-#   keep_h = keep_h,
-#   keep_l = keep_l,
-#   exploding = exploding,
-#   reroll = reroll,
-#   success = success,
-#   reroll = reroll
-# )
