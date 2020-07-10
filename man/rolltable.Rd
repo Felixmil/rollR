@@ -7,7 +7,8 @@
 rolltable(cmd, repetitions = 1, verbose = FALSE)
 }
 \arguments{
-\item{cmd}{character string describing the dice roll to compute.}
+\item{cmd}{character string describing the dice roll to compute.
+Can be of any length, but each character element can only represent a single dice set with no operators.}
 
 \item{repetitions}{Number of times to roll the command.}
 
@@ -15,10 +16,23 @@ rolltable(cmd, repetitions = 1, verbose = FALSE)
 }
 \description{
 Class used to store multiple dice rolls for a roll command.
-This function is the main helper, which sets up a new rolltable.
+This function is the main helper, and sets up a new rolltable.
+}
+\details{
+Users interested in simulation may wish to use the rolltable class directly.
+For example, the following simulates 1000 different D&D 5e ability rolls:
+\code{rolltable("4d6h3", repetitions = 1000)}
+
+You can apply mathematical operations to one or more rolltables. For example:
+\code{(rolltable("3d6") * 3) + rolltable("1d4r1")}
+\code{median(rolltable("4d6h3", repetitions = 1000))}
 }
 \examples{
-rolltable("2d20h1 + 20")
-rolltable("2d20h1 + 20", repetitions = 3)
-rolltable("2d20h1 + 20", verbose = TRUE)
+rolltable("2d20h1")
+rolltable("2d20h1", repetitions = 5) + rolltable("10")
+
+# How often would advantage beat disadvantage in D&D 5e?
+result <- rolltable("2d20h1", repetitions = 1000) > rolltable("2d20l1", repetitions = 1000)
+summary(result[[1]])
+
 }

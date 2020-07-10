@@ -126,7 +126,7 @@ detect_dice_type <- function(die) {
     if(any(idx)) {
       res$Type[idx] <- r$name
 
-      # match, but lose the initial repetion of the full pattern
+      # match, but lose the initial repetition of the full pattern
       match_fn <- function(string, pattern) {
         stringr::str_match(string = string, pattern = pattern)[, -1]
       }
@@ -223,7 +223,7 @@ double <- list(name = "double",
                })
 
 exploding <- list(name = "exploding",
-                  pattern = "^\\d+[dD]\\d+\\!(?:[>](\\d+))?",
+                  pattern = "^\\d+d\\d+\\!(?:[>](\\d+))?",
                   calculate = function(base_roll, match, sides, i_str = "1", ...) {
                     match <- as.integer(match)
                     sides <- as.integer(sides)

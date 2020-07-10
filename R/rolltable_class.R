@@ -1,17 +1,31 @@
 #' Rolltable class
 #'
 #' Class used to store multiple dice rolls for a roll command.
-#' This function is the main helper, which sets up a new rolltable.
+#' This function is the main helper, and sets up a new rolltable.
 #'
 #' @param cmd character string describing the dice roll to compute.
+#'   Can be of any length, but each character element can only represent a single dice set with no operators.
 #' @param repetitions Number of times to roll the command.
 #' @param verbose If TRUE, dice rolls details are visible in the console.
 #' @export
 #'
+#' @details
+#' Users interested in simulation may wish to use the rolltable class directly.
+#' For example, the following simulates 1000 different D&D 5e ability rolls:
+#' \code{rolltable("4d6h3", repetitions = 1000)}
+#'
+#' You can apply mathematical operations to one or more rolltables. For example:
+#' \code{(rolltable("3d6") * 3) + rolltable("1d4r1")}
+#' \code{median(rolltable("4d6h3", repetitions = 1000))}
+#'
 #' @examples
-#' rolltable("2d20h1 + 20")
-#' rolltable("2d20h1 + 20", repetitions = 3)
-#' rolltable("2d20h1 + 20", verbose = TRUE)
+#' rolltable("2d20h1")
+#' rolltable("2d20h1", repetitions = 5) + rolltable("10")
+#'
+#' # How often would advantage beat disadvantage in D&D 5e?
+#' result <- rolltable("2d20h1", repetitions = 1000) > rolltable("2d20l1", repetitions = 1000)
+#' summary(result[[1]])
+#'
 rolltable <- function(cmd, repetitions = 1, verbose = FALSE) {
   cmd <- tolower(cmd) # avoid needing to check for a bunch of capital letters
   error_txt <- "Rolltable only accepts single dice set commands (e.g., '2d6!', not '2d6! + 20'. To add, subtract, or use other mathematical symbols either apply the symbol to rolltables directly or use roll_dice."
@@ -41,7 +55,7 @@ new_rolltable <- function(cmd, tbl) {
   structure(
     .Data = tbl,
     command = cmd,
-    class = c("rolltable", "data.frame")
+    class = c("rolltable", "rollr", "data.frame")  # rollr virtual class needed for Ops methods.
   )
 }
 
@@ -92,8 +106,19 @@ calculate <- function(tbl, ...) { UseMethod("calculate") }
 
 #' @export
 calculate.rolltable <- function(tbl, .summary_fn = "identity") {
-  parse_result(tbl, .summary_fn = get(.summary_fn))
+  out <- parse_result(tbl, .summary_fn = get(.summary_fn))
+  new_rolltable_calculation(out)
 }
+
+#' Number of repetitions in a rolltable
+#'
+#' @param tbl A rolltable class.
+#' @return Integer value indicating the number of repetitions.
+#' @export
+repetitions <- function(tbl, ...) { UseMethod("repetitions") }
+
+#' @export
+repetitions.rolltable <- function(tbl, ...) { max(tbl$Repetition) }
 
 #' Mean rolltable
 #'
@@ -209,3 +234,77 @@ trim_numeric_string <- function(str, digits = 2) {
   p <- sprintf("([[:digit:]]+[.])([[:digit:]]{%d})[[:digit:]]+", digits)
   stringr::str_replace_all(str, pattern = p, replacement = "\\1\\2")
 }
+
+
+
+# Ops.rolltable <- function(e1, e2 = NULL) {
+#   # mostly copied from Ops.data.frame
+#   unary <- nargs() == 1L
+#   lclass <- nzchar(.Method[1L])
+#   rclass <- !unary && (nzchar(.Method[2L]))
+#   FUN <- get(.Generic, envir = parent.frame(), mode = "function")
+#   f <- if (unary) { quote(FUN(left)) } else { quote(FUN(left, right)) }
+#
+#   if(lclass && rclass) {
+#     # both e1 and e2 are rolltables
+#     # conform repetitions
+#     if(repetitions(e1) != repetitions(e2)) {
+#       warning("Number of repetitions do not match. They will be increased accordingly, which will cause the smaller table to be rerolled.")
+#       n_reps <- max(repetitions(e1), repetitions(e2))
+#       if(repetitions(e1) != n_reps) e1 <- roll(e1, repetitions = n_reps)
+#       if(repetitions(e2) != n_reps) e2 <- roll(e2, repetitions = n_reps)
+#     }
+#   } else if(lclass) {
+#     # e1 is a rolltable
+#     if(!unary) {
+#       if(!(is.numeric(e2) | is.logical(e2) | is.integer(e2))) stop("Operation is only defined for numeric vectors.")
+#       if(length(e2) > 1 & length(e2) != repetitions(e1)) {
+#         warning("Number of repetitions do not match the size of the numeric vector. Repetitions will be changed accordingly, which will cause the table to be rerolled.")
+#         e1 <- roll(e1, repetitions = length(e2))
+#       }
+#
+#     }
+#
+#   } else if(rclass) {
+#     # e2 is a rolltable
+#     if(!unary) {
+#       if(!(is.numeric(e1) | is.logical(e1) | is.integer(e1))) stop("Operation is only defined for numeric vectors.")
+#       if(length(e1) > 1 & length(e1) != repetitions(e2)) {
+#         warning("Number of repetitions do not match the size of the numeric vector. Repetitions will be changed accordingly, which will cause the table to be rerolled.")
+#         e2 <- roll(e2, repetitions = length(e1))
+#       }
+#     }
+#
+#   } else stop("Should not be here.")
+#
+#   # apply the function
+#   if(unary) {
+#     left <- calculate(e1)
+#
+#   } else if(lclass && rclass) {
+#     # both e1 and e2 are rolltables
+#     left <- calculate(e1)
+#     right <- calculate(e2)
+#
+#   } else if(lclass) {
+#     # e1 is a rolltable
+#     left <- calculate(e1)
+#     right <- e2
+#
+#   } else if(rclass) {
+#     # e2 is a rolltable
+#     left <- e1
+#     right <- calculate(e2)
+#   }
+#
+#   # value <- eval(f)
+#   # eval(f)
+#   # return(.Generic)
+#
+#   return(paste(class(e1), .Generic, class(e2)))
+#   # return(list(method_one = .Method[1L],
+#   #             method_two = .Method[2L]))
+#
+# }
+
+
