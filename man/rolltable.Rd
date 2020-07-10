@@ -35,4 +35,8 @@ rolltable("2d20h1", repetitions = 5) + rolltable("10")
 result <- rolltable("2d20h1", repetitions = 1000) > rolltable("2d20l1", repetitions = 1000)
 summary(result[[1]])
 
+# convert to dataframe
+as.data.frame(rolltable("2d20h1", repetitions = 10))
+as.data.frame(rolltable(c("1d6", "2d6", "3d6", "4d6"), repetitions = 2))
+
 }

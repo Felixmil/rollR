@@ -4,10 +4,14 @@
 \alias{median.rolltable}
 \title{Median rolltable}
 \usage{
-\method{median}{rolltable}(x, na.rm = FALSE)
+\method{median}{rolltable}(x, na.rm = FALSE, ...)
 }
 \arguments{
 \item{x}{A rolltable class.}
+
+\item{na.rm}{Unused. For consistency with \code{\link[stats]{median}}.}
+
+\item{...}{Unused. For consistency with \code{\link[stats]{median}}.}
 }
 \value{
 A numeric vector whose names are the individual means for each dice set.

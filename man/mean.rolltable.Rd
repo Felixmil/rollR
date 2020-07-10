@@ -4,10 +4,12 @@
 \alias{mean.rolltable}
 \title{Mean rolltable}
 \usage{
-\method{mean}{rolltable}(x)
+\method{mean}{rolltable}(x, ...)
 }
 \arguments{
 \item{x}{A rolltable class.}
+
+\item{...}{Unused.}
 }
 \value{
 A numeric vector whose names are the individual means for each dice set.

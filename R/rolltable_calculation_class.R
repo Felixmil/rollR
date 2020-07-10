@@ -5,6 +5,7 @@
 #' Typically, this function is not needed by the user, who instead should rely on \code{\link{calculate}}.
 #'
 #' @param lst A list object returned using the "by" function.
+#' @param n Names to use for the returned object, if the lst is not already named.
 #' @return A rolltable_calculation classed object.
 #'
 #' @export
@@ -33,6 +34,7 @@ repetitions.rolltable_calculation <- function(tbl, ...) { length(tbl[[1]]) }
 #' Repetitions will be increased to match, which will cause the rolltable to be rerolled.
 #' If dies differ within a rolltable, each will be treated separately.
 #'
+#' @inheritParams base::groupGeneric
 #' @export
 Ops.rollr <- function(e1, e2 = NULL) {
   # The rollr class is used similarly to how POSIXt class is used, to permit operations on rolltables or rolltable calculations, or both.

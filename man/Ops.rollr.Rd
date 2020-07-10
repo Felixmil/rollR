@@ -6,6 +6,11 @@
 \usage{
 \method{Ops}{rollr}(e1, e2 = NULL)
 }
+\arguments{
+\item{e1}{objects.}
+
+\item{e2}{objects.}
+}
 \description{
 Permits mathemetical operations on rolltables or rolltable calculations in certain circumstances.
 Namely, the number of repetitions must match between objects, or one object is a length-one vector.

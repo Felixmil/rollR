@@ -89,7 +89,7 @@ roll_dice <- function(cmd, roll_history=FALSE, repetitions = 1, verbose = FALSE)
   }
 
   # parse the command and create a roll table for each dices.
-  parsed_cmd <- rollr:::parse_roll_cmd(cmd)
+  parsed_cmd <- parse_roll_cmd(cmd)
 
   tbls <- lapply(parsed_cmd$dices, rolltable, repetitions = repetitions, verbose = verbose)
   # names(tbls) <- parsed_cmd$dices
@@ -118,6 +118,9 @@ roll_dice <- function(cmd, roll_history=FALSE, repetitions = 1, verbose = FALSE)
 #' So that a command can be substituted without accidentally overwriting the number.
 #' For example, subbing "1d6 + 1" with tbls[[1]] and tbls[[2]] needs to result in tbls[[1]] + tbls[[2]]
 #' But instead will result in tbls[[tbls[[2]]]] + 1
+#' @param n Number of distinct names required
+#' @return a character vector of unique names
+#' @importFrom utils combn
 infinite_letters <- function(n) {
   max_n <- 0
   k <- 0

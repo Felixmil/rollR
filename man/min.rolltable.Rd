@@ -4,10 +4,12 @@
 \alias{min.rolltable}
 \title{Min rolltable}
 \usage{
-\method{min}{rolltable}(tbl, ..., na.rm = FALSE)
+\method{min}{rolltable}(..., na.rm = FALSE)
 }
 \arguments{
-\item{tbl}{A rolltable class.}
+\item{...}{A rolltable class.}
+
+\item{na.rm}{Unused. For consistency with \code{\link[base]{min}}.}
 }
 \value{
 A numeric vector whose names are the individual minimums for each dice set.

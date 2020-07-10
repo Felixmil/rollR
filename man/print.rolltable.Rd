@@ -4,16 +4,18 @@
 \alias{print.rolltable}
 \title{Print a rolltable}
 \usage{
-\method{print}{rolltable}(tbl, n = 10, rolls = FALSE, digits = 1, ...)
+\method{print}{rolltable}(x, n = 10, rolls = FALSE, digits = 1, ...)
 }
 \arguments{
-\item{tbl}{A rolltable class.}
+\item{x}{A rolltable class.}
 
 \item{n}{Number of repetitions to print.}
 
 \item{rolls}{If TRUE, print the base rolls and modifications to rolls, such as keep highest or exploding.}
 
 \item{digits}{Round numbers to this number of digits when printing.}
+
+\item{...}{Unused.}
 }
 \description{
 Print a rolltable

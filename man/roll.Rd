@@ -4,24 +4,16 @@
 \alias{roll}
 \title{Roll Method}
 \usage{
-roll(tbl, ...)
+roll(obj, ...)
 }
 \arguments{
-\item{tbl}{A rolltable class.}
+\item{obj}{Object to roll}
 
-\item{repetitions}{Number of times to roll the command.}
-
-\item{verbose}{If TRUE, dice roll details are visible in the console.}
+\item{...}{For use by class methods}
 }
 \value{
 An updated rolltable.
 }
 \description{
-Takes a rolltable and rolls to create a new set of results, using one or more repetitions.
-}
-\examples{
-
-tbl <- rolltable("2d20h1 + 20"); tbl
-roll(tbl, repetitions = 3)
-roll(tbl, repetitions = 2, verbose = TRUE)
+Method for rolling dice.
 }

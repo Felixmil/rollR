@@ -4,10 +4,12 @@
 \alias{max.rolltable}
 \title{Max rolltable}
 \usage{
-\method{max}{rolltable}(tbl, ..., na.rm = FALSE)
+\method{max}{rolltable}(..., na.rm = FALSE)
 }
 \arguments{
-\item{tbl}{A rolltable class.}
+\item{...}{A rolltable class.}
+
+\item{na.rm}{Unused. For consistency with \code{\link[base]{min}}.}
 }
 \value{
 A numeric vector whose names are the individual maximums for each dice set.

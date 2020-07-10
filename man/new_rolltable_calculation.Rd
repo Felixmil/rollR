@@ -8,6 +8,8 @@ new_rolltable_calculation(lst, n = names(lst))
 }
 \arguments{
 \item{lst}{A list object returned using the "by" function.}
+
+\item{n}{Names to use for the returned object, if the lst is not already named.}
 }
 \value{
 A rolltable_calculation classed object.

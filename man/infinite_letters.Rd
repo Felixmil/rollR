@@ -9,6 +9,12 @@ But instead will result in tbls[[tbls[[2]]]] + 1}
 \usage{
 infinite_letters(n)
 }
+\arguments{
+\item{n}{Number of distinct names required}
+}
+\value{
+a character vector of unique names
+}
 \description{
 Helper function to create names using only letters, not numbers
 So that a command can be substituted without accidentally overwriting the number.

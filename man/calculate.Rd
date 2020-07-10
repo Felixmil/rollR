@@ -4,23 +4,22 @@
 \alias{calculate}
 \title{Method to calculate the current value of a rolltable}
 \usage{
-calculate(tbl, ...)
+calculate(obj, ...)
 }
 \arguments{
-\item{tbl}{A rolltable class.}
+\item{obj}{Table to calculate, such as a rolltable.}
 
-\item{.summary_fn}{Function used to summarize results between repetitions. Default returns each repetition separately.}
+\item{...}{For use by class methods}
 }
 \value{
 A numeric vector whose names are the individual sums for each dice set.
 }
 \description{
-For each repetition in the rolltable, summarizes each dice set and
-applies the operators in turn.
+Method to calculate the current value of a rolltable
 }
 \examples{
 
-tbl <- rolltable("2d20h1 + 20")
+tbl <- rolltable("2d20h1")
 calculate(tbl)
 calculate(tbl, .summary_fn = "median")
 }

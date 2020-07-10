@@ -1,38 +1,19 @@
-#' Roll One
-#'
-#' @description Roll one die from string command.
-#'
-#' @param roll a string corresponding to a roll command.
-#'
-#' @return result of the roll
-roll_one <- function(roll){
-  for (r in roll_types) { # we try rolls patterns one by one
-    detected = stringr::str_detect(roll,r$pattern)
-    if (detected) { # when a pattern matches
-      match = stringr::str_match(roll, r$pattern)
-      result = r$compute(match) # it is possible to make the roll and apply its rules
-      return(result)
-    }
-  }
-  warning("This roll command is not recognized")
-}
-
 # should be able to handle all of the following, in one go
 # die <- tolower(c("1d6", "10d6", "20d20", "10", "2d20h1", "3d10h2", "2d20l1", "1d20r1",  "3d6!", "2d6>=5", "4d6=5", "4dF", "1d10!>9", "3d10!>=8", "1d10t10"))
 
 construct_dice_table <- function(die) {
   cbind(Die = die,
         Repetition = 1,
-        rollr:::detect_dice(die),
-        rollr:::detect_dice_type(die)[,-1], # lose the Die column
-        rollr:::detect_success_test(die)[,-1], # lose the Die column
+        detect_dice(die),
+        detect_dice_type(die)[,-1], # lose the Die column
+        detect_success_test(die)[,-1], # lose the Die column
         stringsAsFactors = FALSE)
 }
 
 calculate_dice_table <- function(dice_tbl, verbose = FALSE) {
-  dice_tbl <- rollr:::roll_base_dice(dice_tbl)
-  dice_tbl <- rollr:::calculate_types(dice_tbl)
-  dice_tbl <- rollr:::calculate_successes(dice_tbl)
+  dice_tbl <- roll_base_dice(dice_tbl)
+  dice_tbl <- calculate_types(dice_tbl)
+  dice_tbl <- calculate_successes(dice_tbl)
   return(dice_tbl)
 }
 
@@ -95,9 +76,9 @@ calculate_successes <- function(dice_tbl) {
   iteration_s <- paste0("%0", ceiling(nrow(dice_tbl) / 10), "d")
   for(i in seq_len(nrow(dice_tbl))) {
     type <- dice_tbl$Success[[i]]
-    if(dice_tbl$Success[[i]] %in% names(rollr:::success_types) & !is.na(dice_tbl$Success[[i]])) {
+    if(dice_tbl$Success[[i]] %in% names(success_types) & !is.na(dice_tbl$Success[[i]])) {
       i_str <- sprintf(iteration_s, i)
-      calculation_fn <- rollr:::success_types[[type]]$calculate
+      calculation_fn <- success_types[[type]]$calculate
       dice_tbl$Success.Outcome[[i]] <- calculation_fn(base_roll = dice_tbl$Calculated.Roll[[i]],
                                                       match = dice_tbl$Success.Match[[i]],
                                                       i_str = i_str)
@@ -122,17 +103,17 @@ detect_dice_type <- function(die) {
   res$Type <- NA
   res$Type.Match <- vector("list", length(die)) # to accommodate patterns that return multiple sub-matches
 
-  for(r in rollr:::dice_modification_types) {
+  for(r in dice_modification_types) {
     idx <- stringr::str_detect(die, pattern = r$pattern)
     if(any(idx)) res$Type[idx] <- r$name
   }
 
   # rest should be simple or none
-  idx <- stringr::str_detect(res$Die[is.na(res$Type)], rollr:::simple$pattern)
-  res$Type[is.na(res$Type)][idx] <- rollr:::simple$name
+  idx <- stringr::str_detect(res$Die[is.na(res$Type)], simple$pattern)
+  res$Type[is.na(res$Type)][idx] <- simple$name
 
-  idx <- stringr::str_detect(res$Die[is.na(res$Type)], rollr:::none$pattern)
-  res$Type[is.na(res$Type)][idx] <- rollr:::none$name
+  idx <- stringr::str_detect(res$Die[is.na(res$Type)], none$pattern)
+  res$Type[is.na(res$Type)][idx] <- none$name
 
   stopifnot(!anyNA(res$Type))
 
@@ -144,7 +125,7 @@ detect_dice_type <- function(die) {
     if(mod_type %in% c(simple$name, none$name)) next;
     # if(is.na(mod_type)) next; # should not actually occur, as simple or none should pick up everything else
 
-    pattern <- rollr:::dice_modification_types[[mod_type]]$pattern
+    pattern <- dice_modification_types[[mod_type]]$pattern
     res$Type.Match[[i]] <- stringr::str_match(string = res$Die[[i]], pattern = pattern)[,-1]
   }
 
@@ -156,7 +137,7 @@ detect_success_test <- function(die) {
   res$Success <- NA
   res$Success.Match <- vector("list", length(die)) # to accommodate patterns that return multiple sub-matches
 
-  for(s in rollr:::success_types) {
+  for(s in success_types) {
     idx <- stringr::str_detect(die, s$pattern)
     if(any(idx)) res$Success[idx] <- s$name
   }
@@ -164,7 +145,7 @@ detect_success_test <- function(die) {
   for(i in seq_len(length(die))) {
     s_type <- res$Success[[i]]
     if(is.na(s_type)) next;
-    pattern <- rollr:::success_types[[s_type]]$pattern
+    pattern <- success_types[[s_type]]$pattern
     res$Success.Match[[i]] <- stringr::str_match(string = res$Die[[i]], pattern = pattern)[, -1]
   }
 

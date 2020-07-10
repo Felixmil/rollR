@@ -6,6 +6,14 @@
 \usage{
 new_rolltable(cmd, tbl)
 }
+\arguments{
+\item{cmd}{Character vetor. Intended to be one or more dice set commands.}
+
+\item{tbl}{Dataframe to convert to rolltable.}
+}
+\value{
+Rolltable class object.
+}
 \description{
 Internal function to build the rolltable class structure.
 Minimal checks for validity.

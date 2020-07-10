@@ -8,6 +8,8 @@ repetitions(tbl, ...)
 }
 \arguments{
 \item{tbl}{A rolltable class.}
+
+\item{...}{For use by class methods.}
 }
 \value{
 Integer value indicating the number of repetitions.
