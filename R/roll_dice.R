@@ -92,11 +92,12 @@ roll_dice <- function(cmd, roll_history=FALSE, repetitions = 1, verbose = FALSE)
   parsed_cmd <- rollr:::parse_roll_cmd(cmd)
 
   tbls <- lapply(parsed_cmd$dices, rolltable, repetitions = repetitions, verbose = verbose)
-  names(tbls) <- parsed_cmd$dices
+  # names(tbls) <- parsed_cmd$dices
+  names(tbls) <- infinite_letters(length(tbls)) # use letters to avoid subbing over numbers such as 1d6+1 -> tbl[[1]] + tbl[[2]]
 
   cmd_to_eval <- cmd
   for(i in seq_along(parsed_cmd$dices)) {
-    cmd_to_eval <- sub(pattern = parsed_cmd$dices[[i]], replacement = sprintf("tbls[[%d]]", i), x = cmd_to_eval, fixed = TRUE)
+    cmd_to_eval <- sub(pattern = parsed_cmd$dices[[i]], replacement = sprintf("tbls[['%s']]", names(tbls)[[i]]), x = cmd_to_eval, fixed = TRUE)
   }
   result <- eval(parse(text = cmd_to_eval))
 
@@ -105,9 +106,25 @@ roll_dice <- function(cmd, roll_history=FALSE, repetitions = 1, verbose = FALSE)
 
 
   if(roll_history) {
+    names(tbls) <- parsed_cmd$dices
     return(list(result = result,
                 roll_history = tbls))
   }
 
   return(result)
+}
+
+#' Helper function to create names using only letters, not numbers
+#' So that a command can be substituted without accidentally overwriting the number.
+#' For example, subbing "1d6 + 1" with tbls[[1]] and tbls[[2]] needs to result in tbls[[1]] + tbls[[2]]
+#' But instead will result in tbls[[tbls[[2]]]] + 1
+infinite_letters <- function(n) {
+  max_n <- 0
+  k <- 0
+  while(max_n < n) {
+    k <- k + 1
+    max_n <- choose(26, k)
+  }
+  values <- unlist(combn(letters, k, paste0, simplify = FALSE, collapse = ""))
+  values[1:n]
 }
